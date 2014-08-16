@@ -24,6 +24,7 @@ class Admin_grupo extends CI_Controller
         $instancia['user_rol_id']   = $this->session->userdata('user_rol_id');
         $instancia['id_user']       = $this->session->userdata('id_user');    
         $instancia['controlador']   = $this->router->fetch_class();
+		//Recibe parametro para envar parametro de la funcion que el usuario requiere.
         if (!is_null($key)) {
             $instancia[$key['1']] =  $this->router->fetch_method();
         }
