@@ -215,6 +215,10 @@ class Admin_grupo extends CI_Controller
                     'correo'              =>  $this->input->post('correo'),
                     'path_colciencias'    =>  $this->input->post('correo'),
                 );
+                $data_acesor_grupo  = array('usuario_id' =>  $this->session->userdata('user_rol_id'),
+                                            'grupo-id'   =>
+                                            'activo'     => 
+                                            'is_asesor'  => );
                 //if the insert has returned true then we show the flash message
                 $id_grupo = $this->grupo_model->add($data_to_store); 
                     if($this->estado_grupo->add($array)){
