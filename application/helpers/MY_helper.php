@@ -11,19 +11,34 @@ function render_submenu($parametro){
 * @return String
 */
 function mensaje_response($p_error, $target ){
-	if($p_error == TRUE){
-		$respons = '<div class="alert alert-success">';
-        $respons .= '<a class="close" data-dismiss="alert">&times;</a>';
-        $respons .= '<strong>Proceso Exitoso!</strong> '.$target;
-        $respons .= '<em>En hora buena, esta operación ha concluido exitosamente</em> ';
-        $respons .= '</div>';
-
-        }else{
-          $respons = '<div class="alert alert-danger">';
+  if(is_bool($p_error)){
+  	if($p_error == TRUE){
+  		    $respons = '<div class="alert alert-success">';
           $respons .= '<a class="close" data-dismiss="alert">&times;</a>';
-          $respons .= '<strong>Ops!</strong> Valida los datos e intenta de Nuevo. '.$p_error;
-          $respons .= '</div>';          
-        }
+          $respons .= '<strong>Proceso Exitoso!</strong> '.$target;
+          $respons .= '<em>En hora buena, esta operación ha concluido exitosamente</em> ';
+          $respons .= '</div>';
+
+          }else{
+            $respons = '<div class="alert alert-danger">';
+            $respons .= '<a class="close" data-dismiss="alert">&times;</a>';
+            $respons .= '<strong>Ops!</strong> Valida los datos e intenta de Nuevo. '.$p_error;
+            $respons .= '</div>';          
+          }
+    }else{
+      if ($p_error['bandera'] = TRUE) {
+          $respons = '<div class="alert alert-success">';
+          $respons .= '<a class="close" data-dismiss="alert">&times;</a>';
+          $respons .= '<strong>En hora buena! </strong>'.$p_error['response'];
+          $respons .= '</div>';
+      }else{
+        $respons = '<div class="alert alert-warning">';
+          $respons .= '<a class="close" data-dismiss="alert">&times;</a>';
+          $respons .= '<strong>Ops! </strong>'.$p_error['response'].'<br>'.'no hay de que preocuparse todo a sigo guardado.';
+          $respons .= '</div>';
+      }
+      
+    }
         return $respons;
 	}
 

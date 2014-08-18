@@ -127,7 +127,7 @@
             </div>   
           <?php
           echo '<div class="form-group">';
-            echo '<label for="rol_usuario" class="col-lg-2 control-label">Rol Usuario:<em class="">*</em></label>';
+            echo '<label for="rol_usuario" class="col-lg-2 control-label">Rol Usuario<em>* :</em></label>';
             echo '<div class="col-lg-8">';
               
               echo form_dropdown('rol_usuario', $options, set_value('id'), 'class="form-control"');

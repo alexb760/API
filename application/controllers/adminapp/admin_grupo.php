@@ -12,6 +12,8 @@ class Admin_grupo extends CI_Controller
 	{
 		parent::__construct();
 		$this->load->model('dai/grupo_model');
+        $this->load->model('dai/facultad_model');
+        $this->load->model('dai/integrante_model');
 
 		if (!$this->session->userdata('is_logged_in')) {
 			redirect('index.php/main/index');
@@ -58,7 +60,7 @@ class Admin_grupo extends CI_Controller
 
         //pagination settings
         $config['per_page'] = 1;
-        $config['base_url'] = base_url().'index.php/adminapp/admin_usuario/index/';
+        $config['base_url'] = base_url().'index.php/adminapp/admin_grupo/index/';
         $config['use_page_numbers'] = TRUE;
         $config['num_links'] = 20;
         $config['full_tag_open'] = '<ul class= "pagination">';
@@ -130,17 +132,16 @@ class Admin_grupo extends CI_Controller
             }
             else{
                 $order = $this->session->userdata('order');
-            }
+            } 
             $data['order'] = $order;
 
             //save session data into the session
             $this->session->set_userdata($filter_session_data);
 
             //fetch manufacturers data into arrays
-            $data['manufactures'] = $this->manufacturers_model->get_manufacturers();
 
-            $data['count_products']= $this->products_model->count_products($manufacture_id, $search_string, $order);
-            $config['total_rows'] = $data['count_products'];
+            $data['count_grupos']= $this->grupo_model->count();
+            $config['total_rows'] = $data['count_grupos'];
 
             //fetch sql data into arrays
             if($search_string){
@@ -150,10 +151,11 @@ class Admin_grupo extends CI_Controller
                     $data['products'] = $this->products_model->get_products($manufacture_id, $search_string, '', $order_type, $config['per_page'],$limit_end);           
                 }
             }else{
-                if($order){
+                if(false/*$order*/){
                     $data['products'] = $this->products_model->get_products($manufacture_id, '', $order, $order_type, $config['per_page'],$limit_end);        
                 }else{
-                    $data['products'] = $this->products_model->get_products($manufacture_id, '', '', $order_type, $config['per_page'],$limit_end);        
+                    //fetch sql data into arrays
+                    $data['products'] = $this->grupo_model->get_grupo('', '', '', '', $config['per_page'], $limit_end);
                 }
             }
 
@@ -188,54 +190,73 @@ class Admin_grupo extends CI_Controller
         //load the view
         $data['main_content'] = 'admin/grupo/list';
         $this->load->view('includes/template', $data); 
-    } 
+    }
 }//index
 
      public function add()
     {
-        $data['id_grupo'] = 0;
-        //if save button was clicked, get the data sent via post
-        if ($this->input->server('REQUEST_METHOD') === 'POST')
-        {
-
-            //form validation
-            $this->form_validation->set_rules('nombre_grupo', 'nombre_grupo', 'required|min_length[3]|is_unique[grupo.nombre_grupo]');
-            $this->form_validation->set_rules('sigla', 'sigla', 'required|min_length[2]|is_unique[grupo.sigla]');
-            $this->form_validation->set_rules('correo', 'correo', 'required|min_length[2]|is_unique[grupo.correo]');
-
-            $this->form_validation->set_error_delimiters('<div class="alert alert-danger"><a class="close" data-dismiss="alert">&times;</a><strong>', '</strong></div>');
-
-            //if the form has passed through the validation
-            if ($this->form_validation->run())
+        try{
+            $data['id_grupo'] = 0;
+            //if save button was clicked, get the data sent via post
+            if ($this->input->server('REQUEST_METHOD') === 'POST')
             {
-                $data_to_store = array(
-                    'nombre_grupo'        => ucwords($this->input->post('nombre_grupo')),
-                    'sigla'               => strtoupper(trim($this->input->post('sigla'))),
-                    'pagina_web'          =>  $this->input->post('pagina_web'),
-                    'correo'              =>  $this->input->post('correo'),
-                    'path_colciencias'    =>  $this->input->post('correo'),
-                );
-                $data_acesor_grupo  = array('usuario_id' =>  $this->session->userdata('user_rol_id'),
-                                            'grupo-id'   =>
-                                            'activo'     => 
-                                            'is_asesor'  => );
-                //if the insert has returned true then we show the flash message
-                $id_grupo = $this->grupo_model->add($data_to_store); 
-                    if($this->estado_grupo->add($array)){
-                        $data['id_grupo'] = $id_grupo; 
-                        $data['flash_message'] = TRUE; 
-                    }
-                    else
-                        $data['flash_message'] = FALSE;    
-                
-            }
 
-        }
-        //fetch manufactures data to populate the select field
-        $data['manufactures'] = null; //$this->linea_investigacion_model->get_manufacturers();
-        //load the view 
-        $data['main_content'] = 'admin/grupo/add';
-        $this->load->view('includes/template', $data);  
+                //form validation
+                $this->form_validation->set_rules('nombre_grupo', 'nombre_grupo', 'required|min_length[3]|is_unique[grupo.nombre_grupo]');
+                $this->form_validation->set_rules('sigla', 'sigla', 'required|min_length[2]|is_unique[grupo.sigla]');
+                $this->form_validation->set_rules('correo', 'correo', 'required|min_length[2]|is_unique[grupo.correo]');
+                $this->form_validation->set_rules('facultad', 'facultad', 'required');
+
+                $this->form_validation->set_error_delimiters('<p class="alert alert-danger"><a class="close" data-dismiss="alert">&times;</a><strong>', '</strong></p>');
+
+                //if the form has passed through the validation
+                if ($this->form_validation->run())
+                {
+                    $data_to_store = array(
+                        'nombre_grupo'        => ucwords($this->input->post('nombre_grupo')),
+                        'sigla'               => strtoupper(trim($this->input->post('sigla'))),
+                        'pagina_web'          =>  $this->input->post('pagina_web'),
+                        'correo'              =>  $this->input->post('correo'),
+                        'fecha_creacion'      =>  date('Y-m-d H:m:s'),
+                        'path_colciencias'    =>  $this->input->post('path_colciencias'),
+                        'estado_id'           =>  1
+                    );
+                    //arreglo para almacenar el  director del grupo
+                    $id_grupo = $this->grupo_model->add($data_to_store);
+                    if ( $id_grupo != null) {
+                        $data_acesor_grupo  = array(
+                            'usuario_id' => (int) $this->session->userdata('user_rol_id'),
+                            'grupo_id'   => $id_grupo,
+                            'activo'     => 1,
+                            'is_asesor'  => 1,
+                            'facultad_id'=> (int) $this->input->post('facultad'), );
+                    //if the insert has returned true then we show the flash message
+                    if($this->integrante_model->add($data_acesor_grupo)){
+
+                            $param['from'] =  'alexb760@gmail.com';
+                            $param['to'] =   array($data_to_store['correo']);
+                            $param['message'] = $data_to_store['nombre_grupo'].' Ha sido registrado con éxito';
+                            $data['flash_message'] = $this->menus->send_mail($param);
+                        }
+                        else{
+                            $data['flash_message'] = FALSE; 
+                            $this->$this->grupo_model->delete($id_grupo); 
+                        }
+                     }  
+                }
+
+            }
+            //fetch manufactures data to populate the select field
+            $data['manufactures'] = null; //$this->linea_investigacion_model->get_manufacturers();
+            //Obtiene todas las facultades para pintarlas en el combo box
+            $data['facultad'] = $this->facultad_model->get_all();
+            //load the view 
+            $data['main_content'] = 'admin/grupo/add';
+            $this->load->view('includes/template', $data);
+
+        }catch(Exception $e){
+            show_error($e->getMessage().' --- '.$e->getTraceAsString());
+        } 
     }
 
 

@@ -1,4 +1,5 @@
     <div class="container top">
+    <div class="row">  
       <ul class="breadcrumb">
         <li>
           <a href="<?php echo site_url("index.php/adminapp"); ?>">
@@ -23,6 +24,7 @@
         </h2>
       </div>
       
+      
       <?php
       //flash messages
        if(isset($flash_message)){
@@ -38,14 +40,12 @@
         $options_manufacture[$row['id']] = $row['name'];
       }*/
 
-      //form validation
-      echo validation_errors();
-
        echo form_open('index.php/'.$this->uri->segment(1).'/'.$this->uri->segment(2).'/add', $attributes);
       ?>
         <fieldset>
+        <div class="col-xs-8">
           <div class="form-group">
-            <label for="nombre_grupo" class="col-lg-2 control-label">Nombre Grupo:<em class="alert-danger">*</em></label>
+            <label for="nombre_grupo" class="col-lg-2 control-label">Nombre Grupo<em class="">* :</em></label>
             <div class="col-lg-8">
               <input type="text" class="form-control" id="nombre_grupo" name="nombre_grupo"
                placeholder="Digite el nombre de su grupo" 
@@ -54,7 +54,7 @@
             </div>
           </div>
           <div class="form-group">
-            <label for="sigla" class="col-lg-2 control-label">Sigla:<em class="alert-danger">*</em></label>
+            <label for="sigla" class="col-lg-2 control-label">Sigla<em>* :</em></label>
             <div class="col-lg-8">
               <input type="text" class="form-control" id="sigla" name="sigla"
                placeholder="Digite su Sigla del Grupo " 
@@ -73,7 +73,7 @@
             </div> 
             </div>
              <div class="form-group">
-            <label for="correo" class="col-lg-2 control-label">Correo:<em class="alert-danger">*</em></label>
+            <label for="correo" class="col-lg-2 control-label">Correo<em>* :</em></label>
             <div class="col-lg-8">
               <input type="email" class="form-control" id="correo" name="correo"
                placeholder="Digite su Correo Electronico" 
@@ -96,7 +96,33 @@
             <button class="btn btn-primary" type="submit">Guardar</button>
             <button class="btn" type="reset" value="Reset">Cancelar</button>
           </div>
-          </div>  <?php echo form_close(); ?>
-        </fieldset>
+          </div>  
     </div>
+  
+  <div class="col-xs-4">
+  <div class="form-group">
+    <label for="facultad">Facultad: </label>
+    <?php
+            echo '<select class="form-control" name="facultad" id="facultad">';
+            echo '<option value="">Seleccine una Facultad</option>';
+            foreach ($facultad as $row) {
+              echo '<option value="'.$row['id'].'">'.$row['nombre'].'</option>';
+            }
+            echo '</select>';
+            echo '<span class="help-inline">'. form_error('facultad') .'</span>';   
+          ?>
+  </div>  
+  <div class="form-group">
+  <label for="pagina_web_d" >Página Web Director: </label>
+    <input type="url" class="form-control" id="pagina_web_d" name="pagina_web_d"
+     placeholder="Digite su página WEB Ejem: http://mipagina.com.co"
+     pattern="https?://.+" 
+    value="<?php echo set_value('pagina_web_d'); ?>" >
+    <p class="help-block">Link de Colciencias del direcctor, [ Opcional ].</p>
+     <span class="help-inline"><?php echo form_error('pagina_web_d'); ?></span>
+  </div>
+  </div><?php echo form_close(); ?>
+</fieldset>
+</div> <!--Fin Row--> 
+</div>
      

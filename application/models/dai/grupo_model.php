@@ -26,8 +26,6 @@ class Grupo_model extends CI_model
 function add($data){
 	if($this->db->insert($this->tb_name,$data))
 		return  $this->db->insert_id();
-	else
-		return 0;
 				
 }
 
@@ -98,21 +96,21 @@ function get_all_(){
 		$campo = array(
 				'grupo.id',
 				'grupo.nombre_grupo AS Nombre',
-				'grupo.sigla',
-				'grupo.semillero',
-				'grupo.grupo_id',
-				'grupo.avalado_col',
-				'grupo.clasificacion',
-				'concat('<a href=',grupo.pagina_web,'></a>') AS Web',
-				'grupo.correo',
-				'grupo.fecha_creacion',
-				'grupo.path_colciencias',
-				'estado.descripcion',
-				'estado.observacion'
+				'grupo.sigla As Sigla',
+				'grupo.semillero AS Semillero',
+				'grupo.grupo_id  AS Grupo_padre',
+				'grupo.avalado_col AS Avalado_Colciencia',
+				'grupo.clasificacion AS Clasificacion',
+				'grupo.pagina_web AS Web',
+				'grupo.correo AS Correo',
+				'grupo.fecha_creacion AS Fecha_Creado',
+				'grupo.path_colciencias AS Colciencas',
+				'estado.descripcion AS Estado',
+				'estado.observacion AS Observacion'
 				);
 		$this->db->select($campo);
 		$this->db->from($this->tb_name);
-		$this->db->join('estado','estado.id = grupo.estado_id','inner');
+		$this->db->join('estado','estado.id = grupo.estado_id or  grupo.estado_id = null','inner');
 		$this->db->join('integrante','integrante.grupo_id = grupo.id','inner');
 		$this->db->where('integrante.usuario_id', $this->session->userdata('id_user'));
 		$this->db->where('integrante.is_asesor',1);

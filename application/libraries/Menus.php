@@ -184,5 +184,62 @@ function permiso_funcion($p_array){
   }
 }
 
+    /**
+    *funcion Mail
+    *@param array
+    *@return
+    */
+  public function send_mail($param){
+        try{
+            $this->inicializador(); 
+            //libreria mail de codeigniter
+            $this->ci->load->library('email');
+            //parametros de envio
+            $this->ci->email->from($param['from'], $param['from']);
+            $this->ci->email->to($param['to']); 
+            $this->ci->email->cc( (isset($param['cc'])? $param['cc'] : null)); 
+            $this->ci->email->bcc( (isset($param['bcc'])? $param['bcc'] : null)); 
+
+            $this->ci->email->subject( (isset($param['subject'])? $param['subject'] : 'Mensaje del sistema'));
+            //valida si la variable parametros trae ruta adjunto
+            if(isset($param['attach']))
+                $this->ci->email->attach($param['attach']);
+
+            $this->ci->email->message((isset($param['message'])? $param['message'] : 'Mensaje del Sistema'));
+            if(!$this->ci->email->send()){
+                $result['bandera'] = FALSE;
+                $formato = 'Esto es extraño.'.'\n'.' no se ha enviado ningún mensaje ha %s ';
+                $result['response'] =  sprintf($formato, implode(',',$param['to']));
+              }
+              else{
+                $result['bandera'] = TRUE;
+                $formato = 'Un mensaje nuevo se ha enviado a %s ';
+                $result['response'] =  sprintf($formato, implode('\n',$param['to']));
+              }
+            $this->ci->email->clear();
+            return $result;
+
+        }catch(Exception $e){
+          show_error($e->getMessage().' --- '.$e->getTraceAsString());
+        } 
+
+    }
+
+  private function body_mail($p_mensaje){
+    try {
+      
+    } catch (Exception $e) {
+      show_error($e->getMessage().' --- '.$e->getTraceAsString());
+    }
+
+  }
+
+  private function response_mail($p_mensaje){
+    try {
+      
+    } catch (Exception $e){
+      show_error($e->getMessage().' --- '.$e->getTraceAsString());
+    }
+  }
 }
 ?>
