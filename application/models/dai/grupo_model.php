@@ -44,8 +44,16 @@ function get_by_id($id){
 
 //Obtiene todo los datos po una condicion custumizada
 function get_all_(){
-		$this->db->select('*');
+		$campo = array(
+		'grupo.id',
+		'grupo.nombre_grupo'
+		);
+		$this->db->select($campo);
 		$this->db->from('grupo');
+		$this->db->join('estado','estado.id = grupo.estado_id or  grupo.estado_id = null','inner');
+		$this->db->join('integrante','integrante.grupo_id = grupo.id','inner');
+		$this->db->where('integrante.usuario_id', $this->session->userdata('id_user'));
+		$this->db->where('integrante.is_asesor',1);
 		$query = $this->db->get();
 		return $query->result_array(); 
 	}

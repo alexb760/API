@@ -63,11 +63,6 @@
             
             ?>
           </div>
-            <?php
-              if ($products == null)
-                 echo '<div class="alert bg-warning">'.
-               '<strong>Opps!: </strong>'.'No hay datos en el momento'.'</div>';
-            ?>
            <div class="table-responsive">
            <?php
            $parametros['site_url'] = site_url("index.php/adminapp");

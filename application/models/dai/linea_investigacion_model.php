@@ -77,19 +77,15 @@ function get_by_id($id){
 		//return $query->result_array();
 		return $query->result_array();
 	}
-function get_all_(){
-		
-			$campo = array(
-				'*',
+
+	public function get_list_lineas(){
+		$campo = array(
+				'*'
 				);
 			$this->db->select($campo);
 			$this->db->from($this->tb_name);
-		$query = $this->db->get();
-		
-		return $query->result_array(); 
+		return $query = $this->db->get()->result_array();		
 	}
-
- 
 
     /**
     * Update product

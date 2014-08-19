@@ -61,7 +61,7 @@
             
             ?>
           </div>
-           <div class="table-responsive">
+          <div class="table-responsive">
           <?php
            $parametros['site_url'] = site_url("index.php/adminapp");
            $parametros['segment']  = $this->uri->segment(2);

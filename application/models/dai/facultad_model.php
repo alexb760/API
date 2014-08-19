@@ -21,12 +21,6 @@ class Facultad_model extends CI_model
 		$this->db->select($campos);
 		$this->db->from($this->tbl_name);
 		$query = $this->db->get()->result_array();
-/*
-		foreach ($query as $row)
-      	{
-        	$facultad[$row['id']] = $row['nombre'];
-      	}
-      	*/
 		return $query;
 	}
 

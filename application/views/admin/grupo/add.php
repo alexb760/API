@@ -88,6 +88,7 @@
                placeholder="Digite su link colciencias"
                pattern="https?://.+"  
               value="<?php echo set_value('path_colciencias'); ?>" >
+               <p class="help-block">Link de Colciencias del Grupo, [ Opcional ].</p>
                <span class="help-inline"><?php echo form_error('path_colciencias'); ?></span>
             </div>
             </div>

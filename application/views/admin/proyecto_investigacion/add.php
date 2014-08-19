@@ -26,71 +26,70 @@
  
       <?php
       //flash messages
-      if(isset($flash_message)){
-        if($flash_message == TRUE)
-        {
-          echo '<div class="alert alert-success">';
-            echo '<a class="close" data-dismiss="alert">&times;</a>';
-            echo '<strong>Proceso Exitoso!</strong> Nuevo Proyecto Investigacion';
-          echo '</div>';       
-        }else{
-          echo '<div class="alert alert-danger">';
-            echo '<a class="close" data-dismiss="alert">&times;</a>';
-            echo '<strong>Ops!</strong> Valida los datos e intenta de Nuevo.';
-          echo '</div>';          
-        }
+       if(isset($flash_message)){
+        echo mensaje_response($flash_message, '');
       }
       ?>
       
       <?php
-      //form data
+      //form data   , 'enctype'=>'multipart/form-data'
       $attributes = array('class' => 'form-horizontal', 'id' => '');
       $options_manufacture = array('' => "Select");
 
-      //form validation
-      echo validation_errors();
       
-      echo form_open('index.php/adminapp/admin_proyecto_investigacion/add', $attributes);
+      echo form_open_multipart('index.php/adminapp/admin_proyecto_investigacion/add', $attributes);
       ?>
         <fieldset>
           <div class="form-group">
-            <label for="nombre" class="col-lg-2 control-label">Nombre:</label>
+            <label for="nombre_pro" class="col-lg-2 control-label">Descarga de Formatos:</label>
            <div class="col-lg-8">
-              <input class="form-control" type="text" id="nombre" name="nombre_pro" value="<?php echo set_value('tema'); ?>" 
-			  placeholder="Escriba el nombre del Proyecto">
-              <!--<span class="help-inline">Woohoo!</span>-->
+              <div class="span3">
+                <a href="<?php echo base_url(); ?>assets/downloads/formatos/f1.pdf" target="_blank" class="btn btn-default"> 
+                  <span class="glyphicon glyphicon-random"></span> Formato 1 </a>
+                <a href="<?php echo base_url(); ?>assets/downloads/formatos/f2.pdf" class="btn btn-primary"> 
+                  <span class="glyphicon glyphicon-download-alt"></span> Formato 1 </a>
+                <a href="<?php echo base_url(); ?>assets/downloads/formatos/REQUERIMIENTOS.docx" class="btn btn-primary"> 
+                  <span class="glyphicon glyphicon-download-alt"></span> Formato 1 </a>
+              </div>
+              <p class="help-block">Favor descargar los formatos y diligenciarlos puntualmente.<br>
+                                    es de vital importancia el contenido claro y conciso de estos documentos. <br>
+                                    <strong>Adjuntar los archivos correctamente diligenciados.</strong>, [ Obligatorio ].</p>
+            </div>
+          </div>
+
+
+          <div class="form-group">
+            <label for="nombre_pro" class="col-lg-2 control-label">Nombre:</label>
+           <div class="col-lg-8">
+              <input class="form-control" type="text" id="nombre_pro" name="nombre_pro" 
+                value="<?php echo set_value('nombre_pro'); ?>" 
+			         placeholder="Escriba el nombre del Proyecto">
+              <span class="help-inline"><?php echo form_error('nombre_pro'); ?></span>
             </div>
           </div>
           <div class="form-group">
             <label for="descripcion" class="col-lg-2 control-label">Descripcion:</label>
             <div class="col-lg-8">
               <textarea class="form-control input-xlarge"  id="descripcion" rows="4" 
-              name="descripcion" value="<?php echo set_value('descripcion'); ?>"></textarea>
+              name="descripcion" value=""><?php echo set_value('descripcion'); ?></textarea>
             </div>
           </div> 
           <div class="form-group">
             <label for="sigla" class="col-lg-2 control-label">Sigla</label>
             <div class="col-lg-8">
               <input class="form-control" type="text" id="sigla" name="sigla" 
-			  value="<?php echo set_value('sigla'); ?>">
-              <!--<span class="help-inline">Woohoo!</span>-->
+			        value="<?php echo set_value('sigla'); ?>">
+              <span class="help-inline"><?php echo form_error('sigla'); ?></span>
             </div>
           </div>
          <div class="form-group">
             <label for="objetivo" class="col-lg-2 control-label">Objetivo:</label>
             <div class="col-lg-8">
               <textarea class="form-control input-xlarge"  id="objetivo" rows="4" 
-              name="descripcion" value="<?php echo set_value('objetivo'); ?>"></textarea>
+              name="objetivo" value=""><?php echo set_value('objetivo'); ?></textarea>
+              <span class="help-inline"><?php echo form_error('objetivo'); ?></span>
             </div>
           </div>
-			<!--		  
-          <div class="form-group">
-            <label for="fecha" class="control-label">Fecha Caduca</label>
-            <div class="controls">
-              <input type="date" id="fecha_caducado" 
-              name="fecha_caducado" value="<?php echo set_value('fecha_caducado'); ?>">
-            </div>
-          </div>-->
           <div class="form-group">
             <label for="linea_investigacion" class="col-lg-2 control-label">Linea Investigacion</label>
             <div class="col-lg-8">
@@ -98,9 +97,10 @@
               <?php 
               echo '<option value="">seleccione</option>';
               foreach ($lineas as $key) {
-                echo '<option value="'.$key['id'].'">'.$key['tema'].'</option>';
+                echo '<option value="'.$key['id'].'">'.$key['linea'].'</option>';
               } ?>  
               </select>
+              <?php echo form_error('linea_investigacion'); ?>
             </div>
           </div>
           <div class="form-group">
@@ -113,17 +113,26 @@
                 echo '<option value="'.$grup['id'].'">'.$grup['nombre_grupo'].'</option>';
               } ?> 
               </select>
+              <?php echo form_error('grupo'); ?>
             </div>
           </div>
-		<div class="form-group">
+            <div class="form-group">
+            <label for="upload_file" class="col-lg-2 control-label">Adjuntar Archivo:</label>
+            <div class="col-lg-8">
+             <input type="file" class="form-control"  name= "upload_file"
+             value="<?php echo set_value('upload_file'); ?>">
+              <span class="help-inline"><?php echo form_error('upload_file'); ?></span>
+            </div>
+          </div>
+		      <div class="form-group">
             <div class="col-lg-offset-2 col-lg-8">
             <button class="btn btn-primary" type="submit">Guardar</button>
             <button class="btn" type="reset">Cancelar</button>
           </div>
-          </div>
+          </div><?php echo form_close(); ?>
         </fieldset>
-		<?php echo form_close(); ?>
-          </div>
+		
+    </div>
 
       
 

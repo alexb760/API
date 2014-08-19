@@ -15,7 +15,6 @@
       <div class="page-header users-header">
         <h2>
           <?php echo ucfirst($this->uri->segment(2));?> 
-          <a  href="<?php echo site_url("index.php/adminapp").'/'.$this->uri->segment(2); ?>/add" class="btn btn-success">Add a new</a>
         </h2>
       </div>
       
@@ -69,44 +68,18 @@ height: 26px;"');
 
           </div>
 
-          <table class="table table-striped table-bordered table-condensed">
-            <thead>
-              <tr>
-                <th class="header">#</th>
-                <th class="yellow header headerSortDown">Nombre</th>
-                <th class="green header">Descripcion</th>
-                <th class="red header">Sigla</th>
-                <th class="blue header">Objetivo</th>
-                <th class="blue header">Fecha Creación</th>
-                <th class="blue header">Fecha Caducado</th>
-                <th class="blue header">Linea Investigación</th>
-                <th class="blue header">Grupo</th>
-              </tr>
-            </thead>
-            <tbody>
-              <?php
-              foreach($products as $row)
-              {
-                echo '<tr>';
-                echo '<td>'.$row['idP'].'</td>';
-                echo '<td>'.$row['nombre'].'</td>';
-                echo '<td>'.$row['descripcion'].'</td>';
-                echo '<td>'.$row['sigla'].'</td>';
-                echo '<td>'.$row['objetivo'].'</td>';
-                echo '<td>'.$row['fecha_creacion'].'</td>';
-                echo '<td>'.$row['fecha_caducado'].'</td>';
-                echo '<td>'.$row['tema'].'</td>';
-                echo '<td>'.$row['nombre_grupo'].'</td>';
-                echo '<td class="crud-actions">
-                  <a href="'.site_url("index.php/adminapp").'/'.$this->uri->segment(2).'/update/'.$row['idP'].'" class="btn btn-info">view & edit</a>  
-                  <a href="'.site_url("index.php/adminapp").'/products/delete/'.$row['idP'].'" class="btn btn-danger">delete</a>
-                </td>';
-                echo '</tr>';
-              }
-              ?>      
-            </tbody>
+           <div class="table-responsive">
+           <?php
+           $parametros['site_url'] = site_url("index.php/adminapp");
+           $parametros['segment']  = $this->uri->segment(2);
+            echo print_table_vertical($products, $permiso, $parametros);
+           ?>
+          </tbody>
+          <tfooter>
+            <tr ><td colspan="3"><span class=""><?php echo $count.' Registros'; ?></span></td></tr>
+          </tfooter>
           </table>
-
+      </div>
           <?php echo '<div class="pagination">'.$this->pagination->create_links().'</div>'; ?>
 
       </div>

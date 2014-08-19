@@ -36,7 +36,7 @@ public function render_submenu(){
                               base_url().'index.php/'.$key['directorio'].'/'.$key['controlador'].'/'
                               .$key['funcion'].'?smr='.base64_encode($key['id']).'">';
                         $menu_user .= '<span class="glyphicon glyphicon-cog"></span>';
-                        $menu_user .= '<strong>'.$key['nombre'].'</strong></a>';
+                        $menu_user .= '<strong>'.utf8_decode($key['nombre']).'</strong></a>';
                         $array = $this->menu(FALSE,$key['id']);
                         if ( is_array($array)) {
                             $menu_user .= $this->sub_menu_usuario($array);
@@ -53,7 +53,7 @@ public function render_submenu(){
     $respons_submenu = '<ul class="dropdown-menu">';
     foreach ($paramentro as $key ) {
       $respons_submenu .= '<li><a tabindex="-1" href="'.base_url("index.php/").'/'.$key['directorio'].'/'.$key['controlador'].'/'.$key['funcion'].'">';
-      $respons_submenu .= $key['nombre'].' </a></li>';
+      $respons_submenu .= utf8_decode($key['nombre']).' </a></li>';
     }
     $respons_submenu .= '</ul>';
     return $respons_submenu;
@@ -183,12 +183,21 @@ function permiso_funcion($p_array){
       return FALSE;
   }
 }
+/*
+|--------------------------------------------------------------------------
+| FUNCIONES MANEJO DE CORREO
+|--------------------------------------------------------------------------
+|
+| Funciones para envío de correo,
+| 
+|
+*/
 
-    /**
-    *funcion Mail
-    *@param array
-    *@return
-    */
+/**
+*funcion Mail
+*@param array
+*@return
+*/
   public function send_mail($param){
         try{
             $this->inicializador(); 
@@ -207,14 +216,14 @@ function permiso_funcion($p_array){
 
             $this->ci->email->message((isset($param['message'])? $param['message'] : 'Mensaje del Sistema'));
             if(!$this->ci->email->send()){
-                $result['bandera'] = FALSE;
+                $result['status'] = FALSE;
                 $formato = 'Esto es extraño.'.'\n'.' no se ha enviado ningún mensaje ha %s ';
-                $result['response'] =  sprintf($formato, implode(',',$param['to']));
+                $result['message'] =  sprintf($formato, implode(',',$param['to']));
               }
               else{
-                $result['bandera'] = TRUE;
+                $result['status'] = TRUE;
                 $formato = 'Un mensaje nuevo se ha enviado a %s ';
-                $result['response'] =  sprintf($formato, implode('\n',$param['to']));
+                $result['message'] =  sprintf($formato, implode('\n',$param['to']));
               }
             $this->ci->email->clear();
             return $result;
@@ -241,5 +250,69 @@ function permiso_funcion($p_array){
       show_error($e->getMessage().' --- '.$e->getTraceAsString());
     }
   }
+  /*-------------------------------------------------------------------------------*/
+
+  /*
+|--------------------------------------------------------------------------
+| FUNCIONES UPLOAD FILE CON CODEIGNITER.
+|--------------------------------------------------------------------------
+|
+| funciones de manejo de archivos.| 
+|
+*/
+public function upload_file($params){
+  try{
+      $max_size = 1024;
+      $this->inicializador(); 
+      //libreria mail de codeigniter
+      $this->ci->load->helper('string');
+      $status = FALSE;
+      $message = '';
+      $info = '';
+      $file_element_name = $params['file'];
+      $dir_user = $params['dir_user'];
+      echo $params['file'].'antes de crear directoio';
+    if(!is_dir('/uploads/grupos/'. $dir_user)){
+            @mkdir('/uploads/grupos/'.$dir_user);
+      }
+          //$config['upload_path'] = dirname($_SERVER["SCRIPT_FILENAME"])."/assets/uploads/grupos/'";
+          $config['upload_path'] = './assets/uploads/grupos';
+          //$config['upload_url'] = base_url()."/assets/uploads/grupos/";
+          //$config['upload_path'] = './uploads/grupos/'.$dir_user;
+          $config['allowed_types'] = 'doc|docx|pdf|txt|xsl|xslx|html|odf|rar|zip|7zip';
+          $config['max_size'] = $max_size * 8;
+          $config['overwrite'] = TRUE;
+          $this->ci->load->library('upload',$config);
+          //$this->ci->upload->initialize($config);
+          if (!$this->ci->upload->do_upload($file_element_name)) {// Validation Errors. FAIL
+              $status = FALSE;
+              $message = $this->ci->upload->display_errors('', '');
+              $info = implode(' | ',$this->ci->upload->data());
+          } else {
+              $data = $this->ci->upload->data();
+          // casi siempre queremos guardar ese archivo en la base de datos. para eso llamamos el metodo del modelo indicado
+          // $insertFile = $this->SOME_MODEL->SAVE_FILE($data, $title);  // Llamada al modelo para guardar
+          $insertFile = TRUE;
+                        if ($insertFile) {  // File was added correctly to DB
+                            $status = TRUE;
+                            $message = 'Archivo enviado con Éxito!';
+                            $info = implode(' | ', $data);
+                        } else {    // Record wasnt added to DB
+                            unlink($data['full_path']); # Deletes the File
+                            $status = FALSE;
+                            $message = 'Algo va Mal!!...';
+                            $info = '';
+                        }
+                    }
+                    //@unlink($_FILES[$file_element_name]);
+            //$json_encode = json_encode(array('message' => $message, 'status' => $status, 'background' => $background));
+            //echo $json_encode; 
+      return array('message' => $message, 'status' => $status, 'info' => $info);
+    } catch (Exception $e){
+      show_error($e->getMessage().' --- '.$e->getTraceAsString());
+    }
+}
+
+/*--------------------------------------------------------------------------*/
 }
 ?>

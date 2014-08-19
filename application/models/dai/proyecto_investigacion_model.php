@@ -93,25 +93,24 @@ class Proyecto_investigacion_model extends CI_Model
 	}
 
 
-	function get_all($search_string=null, $order=null, $order_type='Asc', $limit_start, $limit_end){
+	function get_proyecto($search_string=null, $order=null, $order_type='Asc', $limit_start, $limit_end){
 		
 			$campo = array(
 				'proyecto_investigacion.id as idP',
-				'proyecto_investigacion.nombre_pro AS nombre',
-				'proyecto_investigacion.descripcion',
-				'proyecto_investigacion.sigla',
-				'proyecto_investigacion.objetivo',
+				'proyecto_investigacion.nombre_pro AS Proyecto',
+				'proyecto_investigacion.descripcion AS Detalle',
+				'proyecto_investigacion.sigla AS Sigla',
+				'proyecto_investigacion.objetivo AS Objetivo',
 				'proyecto_investigacion.fecha_creacion',
 				'proyecto_investigacion.fecha_caducado',
-				'linea_investigacion.id as idl',
-				'linea_investigacion.tema',
-				'grupo.id as idg',
 				'grupo.nombre_grupo'
 				);
 			$this->db->select($campo);
 			$this->db->from($this->tb_name);
-			$this->db->join('linea_investigacion','linea_investigacion_id = linea_investigacion.id','inner');
 			$this->db->join('grupo','proyecto_investigacion.grupo_id = grupo.id','inner');
+			$this->db->join('integrante','grupo.id = integrante.grupo_id','inner');
+			$this->db->where('integrante.usuario_id', $this->session->userdata('id_user'));
+			$this->db->where('integrante.is_asesor', 1);
 
 		if($search_string !== null && $search_string !== ''){
 			$this->db->like('nombre_pro', $search_string);
@@ -128,12 +127,7 @@ class Proyecto_investigacion_model extends CI_Model
 		$this->db->limit($limit_start, $limit_end);
 		//$this->db->limit('10', '0');
 
-
 		$query = $this->db->get();
-		
-		$datos =  array('sql' => $this->db->last_query(),
-						'datos' => $query->result_array() );
-		//return $query->result_array();
 		return $query->result_array();
 	}
 

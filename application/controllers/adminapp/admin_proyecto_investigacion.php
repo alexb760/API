@@ -2,6 +2,10 @@
 
 class Admin_Proyecto_investigacion extends CI_Controller
 {
+    var $permiso;
+    var $per_controlador;
+    var $id_menu;
+
 
   function __construct()
     {
@@ -14,10 +18,33 @@ class Admin_Proyecto_investigacion extends CI_Controller
 			redirect('index.php/main/index');
 		}
 	}
+    private function instancia($key){
+        $instancia  = array();
+        $instancia['user_rol']      = $this->session->userdata('user_rol') ;
+        $instancia['user_rol_id']   = $this->session->userdata('user_rol_id');
+        $instancia['id_user']       = $this->session->userdata('id_user');    
+        $instancia['controlador']   = $this->router->fetch_class();
+        if (!is_null($key)) {
+            $instancia[$key['1']] =  $this->router->fetch_method();
+        }
+        return  $instancia ;
+    }
 
 
  public function index()
     {
+        $this->per_controlador = $this->menus->get_permisos_controlador($this->instancia(null));
+        $data;
+        if ( $this->per_controlador === null && $this->per_controlador['controlador'] != 
+            $this->router->fetch_class()) {
+
+            $p_error['header'] = 'Acceso No autorizado';
+            $p_error['message'] = 'Permisos insuficientes para. '.$this->router->fetch_class();
+            $p_error['menu'] = $this->menus->menu_usuario($this->session->userdata('user_rol_id'));
+            $this->menus->errors($p_error);
+
+        }else{ 
+        $data['permiso'] =  $this->menus->permisos_funciones($this->per_controlador['permiso']);
     	$manufacture_id = $this->input->post('manufacture_id');        
         $search_string = $this->input->post('search_string');        
         $order = $this->input->post('order'); 
@@ -41,7 +68,6 @@ class Admin_Proyecto_investigacion extends CI_Controller
 
         //math to get the initial record to be select in the database
         $limit_end = ($page * $config['per_page']) - $config['per_page'];
-        echo $limit_end;
         if ($limit_end < 0){
             $limit_end = 0;
         } 
@@ -100,24 +126,24 @@ class Admin_Proyecto_investigacion extends CI_Controller
             //fetch manufacturers data into arrays
             $data['manufactures'] = null;//$this->manufacturers_model->get_manufacturers();
 
-            $data['count_products']= $this->proyecto_investigacion_model->count($search_string, $order);
-            $config['total_rows'] = $data['count_products'];
+            $data['count']= $this->proyecto_investigacion_model->count($search_string, $order);
+            $config['total_rows'] = $data['count'];
 
             //fetch sql data into arrays
             if($search_string){
                 if($order){
-                $data['products'] = $this->proyecto_investigacion_model->get_all($search_string, $order, $order_type, $config['per_page'],$limit_end);        
+                $data['products'] = $this->proyecto_investigacion_model->get_proyecto($search_string, $order, $order_type, $config['per_page'],$limit_end);        
                  //$data['products'] = $this->proyecto_investigacion_model->get_all_proyectos($config['per_page'],$limit_end); 
                 }else{
-                $data['products'] = $this->proyecto_investigacion_model->get_all($search_string, '', $order_type, $config['per_page'],$limit_end);           
+                $data['products'] = $this->proyecto_investigacion_model->get_proyecto($search_string, '', $order_type, $config['per_page'],$limit_end);           
                 // $data['products'] = $this->proyecto_investigacion_model->get_all_proyectos($config['per_page'],$limit_end); 
                 }
             }else{
                 if($order){
-                  $data['products'] = $this->proyecto_investigacion_model->get_all('', $order, $order_type, $config['per_page'],$limit_end);        
+                  $data['products'] = $this->proyecto_investigacion_model->get_proyecto('', $order, $order_type, $config['per_page'],$limit_end);        
                  //$data['products'] = $this->proyecto_investigacion_model->get_all_proyectos($config['per_page'],$limit_end); 
                 }else{
-                 $data['products'] = $this->proyecto_investigacion_model->get_all('', '', $order_type, $config['per_page'],$limit_end);        
+                 $data['products'] = $this->proyecto_investigacion_model->get_proyecto('', '', $order_type, $config['per_page'],$limit_end);        
                 //$data['products'] = $this->proyecto_investigacion_model->get_all_proyectos($config['per_page'],$limit_end); 
                 }
             }
@@ -137,12 +163,9 @@ class Admin_Proyecto_investigacion extends CI_Controller
             $data['order'] = 'id';
 
             //fetch sql data into arrays
-            $data['count_products']= $this->proyecto_investigacion_model->count();
-            $data['products'] = $this->proyecto_investigacion_model->get_all('', '', $order_type, $config['per_page'],$limit_end);
-            //$data['products'] = $this->proyecto_investigacion_model->get_all_proyectos($config['per_page'],$limit_end);        
-            //$data['products'] = $this->proyecto_investigacion_model->get_all_();        
-
-            $config['total_rows'] = $data['count_products'];
+            $data['products'] = $this->proyecto_investigacion_model->get_proyecto('', '', $order_type, $config['per_page'],$limit_end);
+            $data['count']= count($data['products']);
+            $config['total_rows'] = $data['count'];
 
         }
 
@@ -152,43 +175,53 @@ class Admin_Proyecto_investigacion extends CI_Controller
         $data['main_content'] = 'admin/proyecto_investigacion/list';
         $this->load->view('includes/template', $data); 
     }
+}
 
  public function add()
     {
         //if save button was clicked, get the data sent via post
         if ($this->input->server('REQUEST_METHOD') === 'POST')
         {
-
             //form validation
-            $this->form_validation->set_rules('nombre_pro', 'nombre', 'required');
+            $this->form_validation->set_rules('nombre_pro', 'nombre', 'required|min_length[5]|is_unique[proyecto_investigacion.nombre_pro]');
             $this->form_validation->set_rules('descripcion', 'descripcion', 'required');
-            $this->form_validation->set_rules('sigla','sigla','required');
-            $this->form_validation->set_rules('objetivo','objetivo','required');
-            $this->form_validation->set_rules('fecha_caducado','fecha caducado','required');
+            $this->form_validation->set_rules('sigla','sigla','required|min_length[2]|is_unique[proyecto_investigacion.sigla]');
+            $this->form_validation->set_rules('objetivo','objetivo','required|min_length[5]');
             $this->form_validation->set_rules('linea_investigacion','linea investigacion','required');
             $this->form_validation->set_rules('grupo','grupo','required');
-            $this->form_validation->set_error_delimiters('<div class="alert alert-error"><a class="close" data-dismiss="alert">×</a><strong>', '</strong></div>');
+            //$this->form_validation->set_rules('upload_file','upload_file','required');
+            $this->form_validation->set_error_delimiters('<div class="alert alert-danger"><a class="close danger" data-dismiss="alert">&times</a><strong>', '</strong></div>');
 
             //if the form has passed through the validation
             if ($this->form_validation->run())
             {
+               // $params['file']     = $this->input->post('upload_file');
+                $params['dir_user'] = $this->input->post('sigla');
+                $params['file']     = 'upload_file';#nombre del campo type=file.
+
+                $data['flash_message'] = $this->menus->upload_file($params);
+                if($data['flash_message']['status']){
 
                 $data_to_store = array(
-                    'nombre_pro' => $this->input->post('nombre_pro'),
-                    'descripcion' => $this->input->post('descripcion'),
-                    'sigla'=>$this->input->post('sigla'),
-                    'objetivo'=>$this->input->post('objetivo'),
+                    'nombre_pro'    => $this->input->post('nombre_pro'),
+                    'descripcion'   => $this->input->post('descripcion'),
+                    'sigla'         => $this->input->post('sigla'),
+                    'objetivo'      => $this->input->post('objetivo'),
                     'fecha_creacion'=> date('Y-m-d H:m:s'),
-                    'fecha_caducado'=> $this->input->post('fecha_caducado'),
-                    'linea_investigacion_id'=>$this->input->post('linea_investigacion'),
-                    'grupo_id'=>$this->input->post('grupo')
-                );
+                    'grupo_id'      => $this->input->post('grupo'),
+                    'path_documento'=> '' 
+                    );
+                $data_to_store_linea_grupo = array(
+                     'linea_investigacion_id'   => $this->input->post('linea_investigacion'),
+                     'grupo_id'                 => $this->input->post('grupo'),
+                    );
                 //if the insert has returned true then we show the flash message
                 if($this->proyecto_investigacion_model->add($data_to_store)){
                     $data['flash_message'] = TRUE; 
                 }else{
                     $data['flash_message'] = FALSE; 
                 }
+            }
             }
         }
 		$grupo_id = 0;
@@ -197,7 +230,7 @@ class Admin_Proyecto_investigacion extends CI_Controller
         }
         //fetch manufactures data to populate the select field
         //$data['manufactures'] = null; //$this->linea_investigacion_model->get_manufacturers();
-         $data['lineas'] = $this->linea_investigacion_model->get_all_();
+         $data['lineas'] = $this->linea_investigacion_model->get_list_lineas();
          if($grupo_id == 0)
             $data['grupos'] = $this->grupo_model->get_all_();
         else
