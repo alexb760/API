@@ -14,7 +14,7 @@
 | path to your installation.
 |
 */
-$config['base_url']	= 'http://localhost:9090/app/';
+$config['base_url']	= 'http://localhost/api/';
 
 /*
 |--------------------------------------------------------------------------
