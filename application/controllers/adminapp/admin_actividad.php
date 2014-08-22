@@ -136,7 +136,8 @@ class Admin_Actividad extends CI_Controller
 
         }
 
-        $this->pagination->initialize($config);   
+        $this->pagination->initialize($config);
+        $data['menu']= $this->menus->menu_usuario($this->session->userdata('user_rol_id'));   
 
         //load the view
         $data['main_content'] = 'admin/actividad/list';

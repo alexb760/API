@@ -225,13 +225,13 @@
         }
     }
 
-    if($idactividad > 0) {
+    //if($idactividad > 0) {
       echo '<ul class="nav nav-tabs">';
         echo "<li>";
           echo "<a  href=javascript:showModal()>Sub Actividad</a>";
         echo "</li>";
       echo '</ul>';
-    }
+    //}
       
     $attributes = array('class' => 'form-horizontal', 'id' => '');
     $options_manufacture = array('' => "Select");

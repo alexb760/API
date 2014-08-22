@@ -5,6 +5,7 @@
 class Grupo_model extends CI_model
 {
 	private $tb_name = 'grupo';
+	private $tbl_integrante = 'integrante';
 	//--------------------------------------------------------------------
 	/*
 	*Tablas detalles en las cuales se debe realizar algún tipo de relacion
@@ -40,6 +41,23 @@ function get_by_id($id){
 		$this->db->where('id', $id);
 		$query = $this->db->get();
 		return $query->result_array(); 
+	}
+
+	public function getxUsuario($usuario){
+
+		$campos = array(
+			'grupo.id as idGrupo',
+			'grupo.nombre_grupo as nombreG');
+
+		$this->db->select($campos);
+		$this->db->from($this->tbl_integrante);
+		$this->db->join('usuario','integrante.usuario_id = usuario.id','inner');
+		$this->db->join('grupo','integrante.grupo_id = grupo.id');
+		$this->db->where('usuario.login',$usuario);
+
+		$query = $this->db->get();
+
+		return $query->result_array();
 	}
 
 //Obtiene todo los datos po una condicion custumizada
