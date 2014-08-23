@@ -3,6 +3,9 @@
 class Admin_Actividad extends CI_Controller
 {
     private $id_actividad;
+    var $permiso;
+    var $per_controlador;
+    var $id_menu;
     
     function __construct()
     {
@@ -17,207 +20,241 @@ class Admin_Actividad extends CI_Controller
 		}
 	}
 
+    private function instancia($key){
+        $instancia  = array();
+        $instancia['user_rol']      = $this->session->userdata('user_rol') ;
+        $instancia['user_rol_id']   = $this->session->userdata('user_rol_id');
+        $instancia['id_user']       = $this->session->userdata('id_user');    
+        $instancia['controlador']   = $this->router->fetch_class();
+        if (!is_null($key)) {
+            $instancia[$key['1']] =  $this->router->fetch_method();
+        }
+        return  $instancia ;
+    }
 
     public function index()
     {
-    	$manufacture_id = $this->input->post('manufacture_id');        
-        $search_string = $this->input->post('search_string');        
-        $order = $this->input->post('order'); 
-        $order_type = $this->input->post('order_type'); 
+        $this->per_controlador = $this->menus->get_permisos_controlador($this->instancia(null));
+        $data;
 
-        $config['per_page'] = 7;
-        $config['base_url'] = base_url().'index.php/adminapp/admin_actividad/index/';
-        $config['use_page_numbers'] = TRUE;
-        $config['num_links'] = 20;
-        $config['full_tag_open'] = '<ul>';
-        $config['full_tag_close'] = '</ul>';
-        $config['num_tag_open'] = '<li>';
-        $config['num_tag_close'] = '</li>';
-        $config['cur_tag_open'] = '<li class="active"><a>';
-        $config['cur_tag_close'] = '</a></li>';
-        $config["uri_segment"] = 4;
-    
-        $page = $this->uri->segment(4);
+        if ($this->per_controlador === null && $this->per_controlador['controlador'] != $this->router->fetch_class()){
 
-        $limit_end = ($page * $config['per_page']) - $config['per_page'];
-        //echo $limit_end;
-        if ($limit_end < 0){
-            $limit_end = 0;
-        } 
-
-        if($order_type){
-            $filter_session_data['order_type'] = $order_type;
-        }
-        else{
-            //we have something stored in the session? 
-            if($this->session->userdata('order_type')){
-                $order_type = $this->session->userdata('order_type');    
-            }else{
-                //if we have nothing inside session, so it's the default "Asc"
-                $order_type = 'Asc';    
-            }
-        }
-        //make the data type var avaible to our view
-        $data['order_type_selected'] = $order_type; 
-
-
-        if($manufacture_id !== false && $search_string !== false && $order !== false || $this->uri->segment(2) == true){ 
-            if($manufacture_id !== 0){
-                $filter_session_data['manufacture_selected'] = $manufacture_id;
-            }else{
-                $manufacture_id = $this->session->userdata('manufacture_selected');
-            }
-            $data['manufacture_selected'] = $manufacture_id;
-
-            if($search_string){
-                $filter_session_data['search_string_selected'] = $search_string;
-            }else{
-                $search_string = $this->session->userdata('search_string_selected');
-            }
-            $data['search_string_selected'] = $search_string;
-
-            if($order){
-                $filter_session_data['order'] = $order;
-            }
-            else{
-                $order = $this->session->userdata('order');
-            }
-            $data['order'] = $order;
-
-            //save session data into the session
-            $this->session->set_userdata($filter_session_data);
-
-            //fetch manufacturers data into arrays
-            $data['manufactures'] = null;//$this->manufacturers_model->get_manufacturers();
-
-            $data['count_products']= $this->actividad_model->count($search_string, $order);
-            $config['total_rows'] = $data['count_products'];
-
-            //fetch sql data into arrays
-            if($search_string){
-                if($order){
-                $data['products'] = $this->actividad_model->get_all($search_string, $order, $order_type, $config['per_page'],$limit_end);        
-                 //$data['products'] = $this->proyecto_investigacion_model->get_all_proyectos($config['per_page'],$limit_end); 
-                }else{
-                $data['products'] = $this->actividad_model->get_all($search_string, '', $order_type, $config['per_page'],$limit_end);           
-                // $data['products'] = $this->proyecto_investigacion_model->get_all_proyectos($config['per_page'],$limit_end); 
-                }
-            }else{
-                if($order){
-                  $data['products'] = $this->actividad_model->get_all('', $order, $order_type, $config['per_page'],$limit_end);        
-                 //$data['products'] = $this->proyecto_investigacion_model->get_all_proyectos($config['per_page'],$limit_end); 
-                }else{
-                 $data['products'] = $this->actividad_model->get_all('', '', $order_type, $config['per_page'],$limit_end);        
-                //$data['products'] = $this->proyecto_investigacion_model->get_all_proyectos($config['per_page'],$limit_end); 
-                }
-            }
+            $p_error['header'] = 'Acceso No autorizado';
+            $p_error['message'] = 'Permisos insuficientes para. '.$this->router->fetch_class();
+            $p_error['menu'] = $this->menus->menu_usuario($this->session->userdata('user_rol_id'));
+            $this->menus->errors($p_error);
 
         }else{
+            $data['permiso'] =  $this->menus->permisos_funciones($this->per_controlador['permiso']);
 
-            //clean filter data inside section
-            $filter_session_data['manufacture_selected'] = null;
-            $filter_session_data['search_string_selected'] = null;
-            $filter_session_data['order'] = null;
-            $filter_session_data['order_type'] = null;
-            $this->session->set_userdata($filter_session_data);
+    	   $manufacture_id = $this->input->post('manufacture_id');        
+            $search_string = $this->input->post('search_string');        
+            $order = $this->input->post('order'); 
+            $order_type = $this->input->post('order_type'); 
 
-            //pre selected options
-            $data['search_string_selected'] = '';
-            $data['manufacture_selected'] = 0;
-            $data['order'] = 'id';
+            $config['per_page'] = 7;
+            $config['base_url'] = base_url().'index.php/adminapp/admin_actividad/index/';
+            $config['use_page_numbers'] = TRUE;
+            $config['num_links'] = 20;
+            $config['full_tag_open'] = '<ul>';
+            $config['full_tag_close'] = '</ul>';
+            $config['num_tag_open'] = '<li>';
+            $config['num_tag_close'] = '</li>';
+            $config['cur_tag_open'] = '<li class="active"><a>';
+            $config['cur_tag_close'] = '</a></li>';
+            $config["uri_segment"] = 4;
+    
+            $page = $this->uri->segment(4);
+
+            $limit_end = ($page * $config['per_page']) - $config['per_page'];
+            //echo $limit_end;
+            if ($limit_end < 0){
+                $limit_end = 0;
+            } 
+
+            if($order_type){
+                $filter_session_data['order_type'] = $order_type;
+            }else{
+            //we have something stored in the session? 
+                if($this->session->userdata('order_type')){
+                    $order_type = $this->session->userdata('order_type');    
+                }else{
+                //if we have nothing inside session, so it's the default "Asc"
+                    $order_type = 'Asc';    
+                }
+            }   
+            //make the data type var avaible to our view
+            $data['order_type_selected'] = $order_type; 
+
+
+            if($manufacture_id !== false && $search_string !== false && $order !== false || $this->uri->segment(2) == true){ 
+                if($manufacture_id !== 0){
+                    $filter_session_data['manufacture_selected'] = $manufacture_id;
+                }else{
+                    $manufacture_id = $this->session->userdata('manufacture_selected');
+                }
+                $data['manufacture_selected'] = $manufacture_id;
+
+                if($search_string){
+                    $filter_session_data['search_string_selected'] = $search_string;
+                }else{
+                    $search_string = $this->session->userdata('search_string_selected');
+                }
+                $data['search_string_selected'] = $search_string;
+
+                if($order){
+                    $filter_session_data['order'] = $order;
+                }
+                else{
+                    $order = $this->session->userdata('order');
+                }
+                $data['order'] = $order;
+
+                //save session data into the session
+                $this->session->set_userdata($filter_session_data);
+
+            //fetch manufacturers data into arrays
+                $data['manufactures'] = null;//$this->manufacturers_model->get_manufacturers();
+
+                $data['count_products']= $this->actividad_model->count($search_string, $order);
+                $config['total_rows'] = $data['count_products'];
 
             //fetch sql data into arrays
-            $data['count_products']= $this->actividad_model->count_();
-            $data['products'] = $this->actividad_model->get_all('', '', $order_type, $config['per_page'],$limit_end);
-            //$data['products'] = $this->proyecto_investigacion_model->get_all_proyectos($config['per_page'],$limit_end);        
-            //$data['products'] = $this->proyecto_investigacion_model->get_all_();        
+                if($search_string){
+                    if($order){
+                    $data['products'] = $this->actividad_model->get_all($search_string, $order, $order_type, $config['per_page'],$limit_end);        
+                    }else{
+                    $data['products'] = $this->actividad_model->get_all($search_string, '', $order_type, $config['per_page'],$limit_end);           
+                    }
+                }else{
+                    if($order){
+                        $data['products'] = $this->actividad_model->get_all('', $order, $order_type, $config['per_page'],$limit_end);        
+                    }else{
+                        $data['products'] = $this->actividad_model->get_all('', '', $order_type, $config['per_page'],$limit_end);        
+                    }
+                }
+            }else{
 
-            $config['total_rows'] = $data['count_products'];
+            //clean filter data inside section
+                $filter_session_data['manufacture_selected'] = null;
+                $filter_session_data['search_string_selected'] = null;
+                $filter_session_data['order'] = null;
+                $filter_session_data['order_type'] = null;
+                $this->session->set_userdata($filter_session_data);
 
+            //pre selected options
+                $data['search_string_selected'] = '';
+                $data['manufacture_selected'] = 0;
+                $data['order'] = 'id';
+
+                //fetch sql data into arrays
+                $data['count_products']= $this->actividad_model->count_();
+                $data['products'] = $this->actividad_model->get_all('', '', $order_type, $config['per_page'],$limit_end);
+                //$data['products'] = $this->proyecto_investigacion_model->get_all_proyectos($config['per_page'],$limit_end);        
+                //$data['products'] = $this->proyecto_investigacion_model->get_all_();        
+
+                $config['total_rows'] = $data['count_products'];
+
+            }
+            $this->pagination->initialize($config);
+            $data['menu']= $this->menus->menu_usuario($this->session->userdata('user_rol_id'));
+            $data['submenu'] = $this->menus->render_submenu();
+            $data['id_menu'] =  $this->id_menu;   
+
+            $data['main_content'] = 'admin/actividad/list';
+            $this->load->view('includes/template', $data); 
         }
-
-        $this->pagination->initialize($config);
-        $data['menu']= $this->menus->menu_usuario($this->session->userdata('user_rol_id'));   
-
-        //load the view
-        $data['main_content'] = 'admin/actividad/list';
-        $this->load->view('includes/template', $data); 
     }
 
     public function add()
     {
-        $val = null;
-        if ($this->input->server('REQUEST_METHOD') === 'POST')
-        {
-            $this->form_validation->set_rules('grupo','grupo','required');
-            $this->form_validation->set_rules('descripcion', 'nombre', 'trim|required|min_length[3]|max_length[200]|is_unique[actividad.descripcion]');
-            $this->form_validation->set_rules('fecha_inicio', 'fecha inicio', 'required');
-            $this->form_validation->set_rules('fecha_fin','fecha fin','callback_fechas');
-            $this->form_validation->set_rules('duracion', 'duración', 'trim|required|is_natural|integer|max_length[3]');
+        $tmp['1'] = 'funcion';
+        if ($this->menus->permiso_funcion($this->instancia($tmp))) {
+            $val = null;
+            if ($this->input->server('REQUEST_METHOD') === 'POST')
+            {
+                $this->form_validation->set_rules('grupo','grupo','required');
+                $this->form_validation->set_rules('descripcion', 'nombre', 'trim|required|min_length[3]|max_length[200]|is_unique[actividad.descripcion]');
+                $this->form_validation->set_rules('fecha_inicio', 'fecha inicio', 'required');
+                $this->form_validation->set_rules('fecha_fin','fecha fin','callback_fechas');
+                $this->form_validation->set_rules('duracion', 'duración', 'trim|required|is_natural|integer|max_length[3]');
 
-            if($this->input->post('observacion') !== NULL){
-                $this->form_validation->set_rules('observacion','observacion','required');
-            }  
+                if($this->input->post('observacion') !== NULL){
+                    $this->form_validation->set_rules('observacion','observacion','required');
+                }  
 
-            $this->form_validation->set_rules('responsable', 'Responsable', 'required');
-            $this->form_validation->set_error_delimiters('<div class="alert alert-danger"><a class="close danger" data-dismiss="alert">&times;</a><strong>', '</strong></div>');
+                $this->form_validation->set_rules('responsable', 'Responsable', 'required');
+                $this->form_validation->set_error_delimiters('<div class="alert alert-danger"><a class="close danger" data-dismiss="alert">&times;</a><strong>', '</strong></div>');
 
-            if ($this->form_validation->run())
-            { 
-                $data_to_store = array(
-                    'descripcion'   => trim($this->input->post('descripcion')),
-                    'fecha_inicio'  => $this->input->post('fecha_inicio'),
-                    'fecha_fin'     => $this->input->post('fecha_fin'),
-                    'observacion'   => trim($this->input->post('observacion')),
-                    'grupo_id'      => $this->input->post('grupo'),
-                    'realizada'     => 1
-                );
-                $IdActividad = $this->actividad_model->add($data_to_store);
-                //$IdActividad = 3;
-                if($IdActividad != NULL){
-                    $data_responsable = array(
-                        'actividad_id' => $IdActividad,
-                        'integrante_id' => $this->input->post('responsable'),
-                        'duracion' => $this->input->post('duracion')
+                if ($this->form_validation->run())
+                { 
+                    $data_to_store = array(
+                        'descripcion'   => trim($this->input->post('descripcion')),
+                        'fecha_inicio'  => $this->input->post('fecha_inicio'),
+                        'fecha_fin'     => $this->input->post('fecha_fin'),
+                        'observacion'   => trim($this->input->post('observacion')),
+                        'grupo_id'      => $this->input->post('grupo'),
+                        'realizada'     => 1
                     );
+                    $IdActividad = $this->actividad_model->add($data_to_store);
+                    //$IdActividad = 3;
+                    if($IdActividad != NULL){
+                        $data_responsable = array(
+                            'actividad_id' => $IdActividad,
+                            'integrante_id' => $this->input->post('responsable'),
+                            'duracion' => $this->input->post('duracion')
+                        );
 
-                   if($this->integrante_model->addResponsable($data_responsable)){
-                        $this->session->set_flashdata('flash_message', 'add');
-                    }else{
-                        $this->session->set_flashdata('flash_message', 'not_add');
+                        if($this->integrante_model->addResponsable($data_responsable)){
+                            $this->session->set_flashdata('flash_message', 'add');
+                        }else{
+                            $this->session->set_flashdata('flash_message', 'not_add');
+                        }
                     }
+
+                    $data['idactividad'] = $IdActividad;
+                    $this->session->set_flashdata('idActividad',$data['idactividad']);
+                    redirect('index.php/adminapp/admin_actividad/add');
+                }else{
+                    $val = 0;
+                    $data['grupoV'] = $this->input->post('grupo');
+                    $data['integranteV'] = $this->input->post('responsable');
+                    $data['integrantes'] = $this->integrante_model->get_by_id_grupo($data['grupoV']);//id del grupo
+                }   
+            }
+            $id = $this->session->flashdata('idActividad');//$this->menu(FALSE);
+            if($id != NULL){
+                $data['product'] = $this->actividad_model->get_by_id_edit($id); //id actividad
+            }else{
+                $data['product'] = NULL;
+                $userLogin = $this->session->userdata('user_name');
+                $data['grupo'] = $this->grupo_model->getxUsuario($userLogin);
+
+                if($val === null){
+                    $data['validator'] = 1;
+                }else{
+                    $data['validator'] = 0;    
                 }
-
-                $data['idactividad'] = $IdActividad;
-                $this->session->set_flashdata('idActividad',$data['idactividad']);
-                redirect('index.php/adminapp/admin_actividad/add');
-
-            }else{
-                $val = 0;
-                $data['grupoV'] = $this->input->post('grupo');
-                $data['integranteV'] = $this->input->post('responsable');
-                $data['integrantes'] = $this->integrante_model->get_by_id_grupo($data['grupoV']);//id del grupo
             }
-        }
-        $id = $this->session->flashdata('idActividad');//$this->menu(FALSE);
-        if($id != NULL){
-            $data['product'] = $this->actividad_model->get_by_id_edit($id); //id actividad
+
+            $data['idactividad'] = $id;
+            $data['manufactures'] = null; 
+            $data['menu']= $this->menus->menu_usuario($this->session->userdata('user_rol_id'));
+            $data['op_submenu'] = $this->menus->render_submenu();
+            $data['id_menu'] = $this->id_menu;
+            $data['options_rol'] = $this->usuario_model->get_rol_option(
+                                                                $this->session->userdata('user_rol_id'),
+                                                                $this->session->userdata('user_rol'));
+            $data['controlador'] = $this->router->fetch_method();
+            $data['main_content'] = 'admin/actividad/add';
+            $this->load->view('includes/template', $data); 
+        
         }else{
-            $data['product'] = NULL;
-            $userLogin = $this->session->userdata('user_name');
-            $data['grupo'] = $this->grupo_model->getxUsuario($userLogin);
-
-            if($val === null){
-                $data['validator'] = 1;
-            }else{
-                $data['validator'] = 0;    
-            }
-        }
-
-        $data['idactividad'] = $id;
-        $data['manufactures'] = null; 
-        $data['main_content'] = 'admin/actividad/add';
-        $this->load->view('includes/template', $data); 
+            $p_error['header'] = 'Acceso No autorizado';
+            $p_error['message'] = 'Permisos insuficientes para. '.$this->router->fetch_class();
+            $p_error['menu'] = $this->menus->menu_usuario($this->session->userdata('user_rol_id'));
+            $this->menus->errors($p_error);   
+        }   
     }
 
     public function update()

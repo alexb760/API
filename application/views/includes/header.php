@@ -1,6 +1,6 @@
 
 <!DOCTYPE html> 
-<html lang="es-CO">
+<html lang="es">
 <meta http-equiv="content-type" content="text/html; charset=UTF-8">
 <head>
   <title>PP GRADO</title>
@@ -26,11 +26,11 @@
         <li class="dropdown active">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">
             <span class="glyphicon glyphicon-cog"></span>
-            <strong>Administracion</strong><b class="caret"></b></a>
+            <strong>Administración</strong>
+            <b class="caret"></b>
+          </a>
           <ul class="dropdown-menu">
-            <?php
-              echo $menu;
-            ?>
+            <?php echo $menu; ?>
           </ul>
         </li>
       </ul>

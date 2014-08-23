@@ -28,7 +28,7 @@ public function render_submenu(){
           if (is_array($menu)) {
                 # Rederiza menu de acuerdo al ROL_USUARIO 
                 $menu_user = '<li class="divider"></li>';
-                $menu_user .= '<li class="dropdown-submenu">';
+                //$menu_user .= '<li class="dropdown-submenu">';
                   foreach ($menu as $key) {
                     if ($key['submenu']  === null) {
                         $menu_user .= '<li class="dropdown-submenu">';
@@ -55,7 +55,7 @@ public function render_submenu(){
       $respons_submenu .= '<li><a tabindex="-1" href="'.base_url("index.php/").'/'.$key['directorio'].'/'.$key['controlador'].'/'.$key['funcion'].'">';
       $respons_submenu .= utf8_decode($key['nombre']).' </a></li>';
     }
-    $respons_submenu .= '</ul>';
+    $respons_submenu .= '</ul></li>';
     return $respons_submenu;
   }
 

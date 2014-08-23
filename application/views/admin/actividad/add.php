@@ -1,8 +1,4 @@
 <script type="text/javascript">
-  /*function Abrir(idactividad){
-      window.open("http://localhost/app/index.php/adminapp/admin_sub_actividad/add/?ael="+idactividad,"SUB ACTIVIDAD", "width=1000, height=700, top=20, left=40, scrollbars=NO,titlebar=NO,menubar=YES,toolbar=NO,directories=YES, location=YES, status=NO,resizable=NO");
-    }*/
-
     function GrupoInfo(){
       xmlhttp = null;
 
@@ -45,17 +41,13 @@
   <ul class="breadcrumb">
     <li>
       <a href="<?php echo site_url("index.php/adminapp"); ?>">
-        <?php 
-          echo ("Inicio");
-        ?>
+        <?php echo ("Inicio"); ?>
       </a> 
       <span class="divider">/</span>
     </li>
     <li>
       <a href="<?php echo site_url("index.php/adminapp").'/'.$this->uri->segment(2); ?>">
-        <?php 
-          echo ("Actividades");
-        ?>
+        <?php echo ("Actividades"); ?>
       </a> 
       <span class="divider">/</span>
     </li>
@@ -225,13 +217,13 @@
         }
     }
 
-    //if($idactividad > 0) {
+    if($idactividad > 0) {
       echo '<ul class="nav nav-tabs">';
         echo "<li>";
           echo "<a  href=javascript:showModal()>Sub Actividad</a>";
         echo "</li>";
       echo '</ul>';
-    //}
+    }
       
     $attributes = array('class' => 'form-horizontal', 'id' => '');
     $options_manufacture = array('' => "Select");
