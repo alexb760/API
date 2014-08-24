@@ -14,6 +14,7 @@ class Admin_Actividad extends CI_Controller
         $this->load->model('dai/integrante_model');
         $this->load->model('dai/grupo_model');
         $this->load->model('dai/sub_actividad_model');
+        //$this->load->library('jquery');
 
 		if (!$this->session->userdata('is_logged_in')) {
 			redirect('index.php/main/index');
@@ -161,6 +162,8 @@ class Admin_Actividad extends CI_Controller
             $data['submenu'] = $this->menus->render_submenu();
             $data['id_menu'] =  $this->id_menu;   
 
+            //$this->jquery->hide('div1');
+
             $data['main_content'] = 'admin/actividad/list';
             $this->load->view('includes/template', $data); 
         }
@@ -260,6 +263,7 @@ class Admin_Actividad extends CI_Controller
     public function update()
     { 
         $varG = null;
+        $id = $this->uri->segment(4);
         if ($this->input->server('REQUEST_METHOD') === 'POST')
         {
             $this->form_validation->set_rules('descripcion', 'nombre', 'trim|required|min_length[3]|max_length[200]');
@@ -299,31 +303,40 @@ class Admin_Actividad extends CI_Controller
                 }else{
                     $this->session->set_flashdata('flash_message', 'not_updated');
                 }
-                redirect('index.php/adminapp/admin_actividad/update/?ael='.$_GET['ael']);
+                //redirect('index.php/adminapp/admin_actividad/update/?ael='.$_GET['ael']);
+                redirect('index.php/adminapp/admin_actividad/update/'.$id);
             }else{
                 $varG = $this->input->post('grupo');
                 $data['grupoV'] = $varG;
                 $data['responsableV'] = $this->input->post('responsable');
             }
         }
-            $id = $this->menu(FALSE);
+            //$id = $this->menu(FALSE);
 
+        if($varG === NULL){
             if($id !== NULL){
+                echo $id.'id';
                 $this->session->set_flashdata('idActividad', $id);
                 $data['product'] = $this->actividad_model->get_by_id_edit($id); //id actividad
                 $data['integrantes'] = $this->integrante_model->get_by_id_grupo($data['product'][0]['idG']);//id del grupo
-                $data['url'] = $_GET['ael'];
+                $data['url'] = $id;//$_GET['ael'];
                 $this->session->set_flashdata('idResponsable',$data['product'][0]['IdResponsable']);
-            }else{
+            }
+        }else{
                 $idR = $this->session->flashdata('idResponsable');
                 $this->session->set_flashdata('idResponsable',$idR);
                 $data['product'] = NULL;
                 $data['integrantes'] = $this->integrante_model->get_by_id_grupo($varG);
-                $data['url'] = $_GET['ael'];
+                $data['url'] = $id;//$_GET['ael'];
                 $userLogin = $this->session->userdata('user_name');
                 $data['grupo'] = $this->grupo_model->getxUsuario($userLogin);
             }
-            
+
+            $data['menu']= $this->menus->menu_usuario($this->session->userdata('user_rol_id'));
+            $data['op_submenu'] = $this->menus->render_submenu();
+            $data['options_rol'] = $this->usuario_model->get_rol_option(
+                                                                $this->session->userdata('user_rol_id'),
+                                                                $this->session->userdata('user_rol'));
             $data['main_content'] = 'admin/actividad/edit';
             $this->load->view('includes/template', $data); 
     }
@@ -388,11 +401,27 @@ class Admin_Actividad extends CI_Controller
 
     public function delete()
     {
-        //product id 
-        $id = $this->uri->segment(4);
-        $this->products_model->delete_product($id);
-        redirect('admin/products');
-    }//edit
+        //$idActividad = $this->menu(FALSE);
+        $idActividad = $this->uri->segment(4);
+        if($this->sub_actividad_model->getXactividad($idActividad) === 0){
+            $tmp['1'] = "funcion";
+
+            if($this->menus->permiso_funcion($this->instancia($tmp))){
+                $id = $this->uri->segment(4);
+                //$this->actividad_model->delete($id);
+                //redirect('index.php/adminapp/admin_actividad/');
+
+                $data['idSub'] = 0;
+
+            }
+            echo 'no tiene';
+        }else{
+            echo 'tiene sub';
+            $this->jquery->hide('div1');
+
+            $data['idSub'] = 1;
+        }
+    }
 
     public function menu($bandera){
         if($bandera){

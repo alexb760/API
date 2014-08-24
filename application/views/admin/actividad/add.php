@@ -1,23 +1,4 @@
 <script type="text/javascript">
-    function GrupoInfo(){
-      xmlhttp = null;
-
-      if(window.XMLHttpRequest){
-        xmlhttp = new XMLHttpRequest();
-      }else{
-        xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-      }
-
-      xmlhttp.onreadystatechange = function(){
-        if(xmlhttp.readyState == 4 && xmlhttp.status == 200){
-          document.getElementById("responsable").innerHTML = xmlhttp.responseText;
-        }
-      }
-      var url = location.href;
-      xmlhttp.open("GET",url, true);
-      xmlhttp.send();
-    }
-
     function inhabilitarCampos(){
       document.getElementById("grupo").disabled = true ;
       document.getElementById("descripcion").disabled = true;
@@ -281,14 +262,14 @@
       <div class="form-group">
         <label for="fecha_inicio" class="col-lg-2 control-label" >Fecha Inicio:</label>
         <div class="col-lg-8">
-          <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" required
+          <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" required 
             value="<?php 
             if($product[0]['fecha_inicio'] != NULL){
               echo $product[0]['fecha_inicio'];
             }else{
               echo set_value('fecha_inicio');
             }
-            ?>">
+            ?>" title="Se requiere fecha inicio">
           <span class="help-inline"><?php echo form_error('fecha_inicio');?></span>
         </div>
       </div>
@@ -302,7 +283,7 @@
               }else{
                 echo set_value('fecha_fin');
               }
-            ?>">
+            ?>" title="Se requiere fecha fin">
               <span id="sp" class="help-inline"><?php echo form_error('fecha_fin');?></span>
         </div>
       </div>
@@ -317,7 +298,7 @@
               }else{
               echo set_value('duracion');
               }
-            ?>">
+            ?>" title="Se requiere la duración en horas">
           <span class="help-inline"><?php echo form_error('duracion');?></span>
         </div>
       </div>
@@ -338,7 +319,7 @@
       <div class="form-group">
         <label for="responsable" class="col-lg-2 control-label">Resposable:</label>
         <div class="col-lg-8">
-          <select name="responsable" id="responsable" class="form-control" required>  
+          <select name="responsable" id="responsable" class="form-control" required title="Se requiere seleccionar un responsable">  
             <?php 
               if($product[0]['IdIntegrante'] != NULL){
                 foreach ($product as $prod){
@@ -371,6 +352,7 @@
       </div>
     </fieldset>
     <script type="text/javascript">
+
       $('#grupo').on('change', buscarResponsable);
 
       function buscarResponsable(){

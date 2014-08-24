@@ -1,3 +1,14 @@
+<script type="text/javascript">
+$(document).ready(function() {
+
+  $('#btnDelete').click(function() {
+    bootbox.confirm("Are you sure want to delete?", function(result) {
+      alert("Confirm result: " + result);
+    });
+  });
+});
+
+</script>
 <div class="container top">
   <ul class="breadcrumb">
     <li>
@@ -13,7 +24,7 @@
 
   <div class="page-header users-header">
     <h2><?php echo ("Actividades"); ?> 
-      <a href="<?php echo site_url("index.php/adminapp").'/'.$this->uri->segment(2); ?>/add" class="btn btn-success">Add a new</a>
+      <!--<a href="<?php echo site_url("index.php/adminapp").'/'.$this->uri->segment(2); ?>/add" class="btn btn-success">Add a new</a>-->
     </h2>
   </div>
       
@@ -30,7 +41,7 @@
               }
               break;
             }
-            echo form_open('adminapp/admin_usuario', $attributes);
+            echo form_open('adminapp/admin_actividad', $attributes);
             echo form_label('Search:', 'search_string');
             echo form_input('search_string', $search_string_selected, 'style="width: 170px; height: 26px;"');
             echo form_label('Filter by manufacturer:', 'manufacture_id');
@@ -46,72 +57,25 @@
             echo form_close();
         ?>
       </div>
-
-      <?php
-        if($products == null){
-          echo  '<div class="alert bg-warning">';
-            echo '<strong>Opps!: </strong>No hay datos de actividades...';
-          echo '</div>';
-        }
-      ?>
-          <!--<div class="table_responsive">
-            <?php
-              $parametros['site_url'] = site_url("index.php/adminapp");
-              $parametros['segment'] = $this->uri->segment(2);
-              //echo prin_table_horizontal($products, $permiso, $parametros);
-            ?>
-            <tfooter>
-              <tr>
-                <td colspan="3">
-                  <span class="">
-                    <?php //echo $count_products.' Registros'; ?>
-                  </span>
-                </td>
-              </tr>
-            </tfooter>
-          </div>
-          <div class="col-md-12">
-            <?php //echo '<div class="pagination">'.($this->pagination->create_links()).'</div>'; ?>
-          </div>-->
-      <table class="table table-striped table-bordered table-condensed">
-        <thead>
+      <div class="table_responsive">
+        <?php
+          $parametros['site_url'] = site_url("index.php/adminapp");
+          $parametros['segment'] = $this->uri->segment(2);
+          echo print_table_vertical($products, $permiso, $parametros);
+        ?>
+      </tbody>
+        <tfooter>
           <tr>
-            <th class="header">id</th>
-            <th class="yellow header headerSortDown">Nombre</th>
-            <th class="green header">Fecha Inicio</th>
-            <th class="red header">Fecha Fin</th>
-            <th class="red header">Duraciòn</th>
-            <th class="blue header">Responsable</th>
-            <th class="blue header">Grupo</th>
-            <th class="blue header">Observaciòn</th>
+            <td colspan="3">
+              <span class="">
+                <?php echo $count_products.' Registros'; ?>
+              </span>
+            </td>
           </tr>
-        </thead>
-        <tbody>
-          <?php
-            $valor = 0;
-            foreach($products as $row){
-              echo '<tr>';
-                echo '<td>'.$row['idA'].'</td>';
-                echo '<td>'.$row['descripcion'].'</td>';
-                echo '<td>'.$row['fecha_inicio'].'</td>';
-                echo '<td>'.$row['fecha_fin'].'</td>';
-                echo '<td>'.$row['duracion'].' Hora(s)</td>';
-                echo '<td>'.$row['nombreU'].'</td>';
-                echo '<td>'.$row['nombreG'].'</td>';
-                echo '<td>'.$row['observacion'].'</td>';
-                echo '<td class="crud-actions">';
-                  echo '<a href="'.site_url("index.php/adminapp").'/'.$this->uri->segment(2).'/update/?ael='.base64_encode($row['idA']).
-                  '" class="btn btn-default btn-lg"><span class="glyphicon glyphicon-edit"></span></a>
-                  <input type="hidden" name="uno" value="'.base64_encode($row['idA']).'" />  
-                  <a href="'.site_url("index.php/adminapp").'/products/delete/'.$row['idA'].
-                  '" class="btn btn-default btn-lg"><span class="glyphicon glyphicon-remove-sign"></span></a>
-                  </td>';
-              echo '</tr>';
-              }
-          ?>      
-        </tbody>
+        </tfooter>
       </table>
-      <?php echo '<div class="pagination">'.$this->pagination->create_links().'</div>'; ?>
+      </div>
+      <div class="col-md-12" id="div1">
+        <?php echo '<div class="pagination">'.($this->pagination->create_links()).'</div>'; ?>
+      </div>
     </div>
-  </div>
-</div>

@@ -4,6 +4,7 @@ class Sub_Actividad_Model extends CI_model
 {
 
 	private $tbl_subActividad = 'sub_actividad';
+	private $tbl_actividad = 'actividad';
 
 	function __construct()
 	{
@@ -54,6 +55,22 @@ class Sub_Actividad_Model extends CI_model
 		$this->db->where('sub_actividad.id', $id);
 		$query = $this->db->get();
 		return $query->result_array(); 
+	}
+
+	public function getXactividad($idActividad){
+		$campos = array(
+			'sub_actividad.id as id',
+			'sub_actividad.descripcion as descripcion',
+			'sub_actividad.fecha_inicio as fechainicio',
+			'sub_actividad.fecha_fin as fecha_fin',
+			'sub_actividad.observacion as observacion',
+			'sub_actividad.realizada as realizada');
+		$this->db->select($campos);
+		$this->db->from($this->tbl_subActividad);
+		$this->db->where('sub_actividad.actividad_id', $idActividad);
+
+		$query = $this->db->get();
+		return $query->result_array();
 	}
 
 	function get_all_sub($search_string=null, $order=null, $order_type='Asc', $limit_start, $limit_end){
