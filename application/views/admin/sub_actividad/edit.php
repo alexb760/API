@@ -44,7 +44,7 @@
       <?php
       $attributes = array('class' => 'form-horizontal', 'id' => '');
       $options_manufacture = array('' => "Select");
-      echo form_open('index.php/adminapp/admin_sub_actividad/update/?ael='.$url.'', $attributes);
+      echo form_open('index.php/adminapp/admin_sub_actividad/update/'.$url.'', $attributes);
       ?>
         <fieldset>
           <div class="form-group">

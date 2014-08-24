@@ -78,7 +78,7 @@
     <div class="form-group">
       <label for="actividad" class="col-lg-2 control-label">Actividad:</label>
       <div class="col-lg-8">
-        <select name="actividad" id="actividad" class="form-control" required>  
+        <select name="actividad" id="actividad" class="form-control" required title="Se requiere una actividad!">  
           <?php
             if($actividadV !== 0){
               foreach ($actividad as $acti) {
@@ -107,7 +107,7 @@
       <label for="descripcion" class="col-lg-2 control-label" >Nombre:</label>
       <div class="col-lg-8">
         <input type="text" class="form-control" id="descripcion" name="descripcion" maxlength="200"
-          placeholder="Escriba nombre de la sub actividad" required
+          placeholder="Escriba nombre de la sub actividad" required title="se requiere el nombre de la sub actividad!"
           value="<?php 
               if($product[0]['descripcion'] != NULL){
                 echo $product[0]['descripcion'];
@@ -128,7 +128,7 @@
               }else{
               echo set_value('fecha_inicio');
               }
-            ?>">
+            ?>" title="Se requiere la fecha de inicio!">
           <span class="help-inline"><?php echo form_error('fecha_inicio');?></span>
       </div>
     </div>
@@ -142,7 +142,7 @@
               }else{
               echo set_value('fecha_fin');
               }
-            ?>">
+            ?>" title="Se requiere la fecha fin!">
           <span class="help-inline"><?php echo form_error('fecha_fin');?></span>
       </div>
     </div>

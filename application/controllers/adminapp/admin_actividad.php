@@ -14,7 +14,6 @@ class Admin_Actividad extends CI_Controller
         $this->load->model('dai/integrante_model');
         $this->load->model('dai/grupo_model');
         $this->load->model('dai/sub_actividad_model');
-        //$this->load->library('jquery');
 
 		if (!$this->session->userdata('is_logged_in')) {
 			redirect('index.php/main/index');
@@ -157,12 +156,16 @@ class Admin_Actividad extends CI_Controller
                 $config['total_rows'] = $data['count_products'];
 
             }
+                $var = $this->session->flashdata('idActividad');
+                if($var !== ""){
+                    $data['idActividad'] = $var;
+                }else{
+                    $data['idActividad'] = 0;
+                }
             $this->pagination->initialize($config);
             $data['menu']= $this->menus->menu_usuario($this->session->userdata('user_rol_id'));
             $data['submenu'] = $this->menus->render_submenu();
             $data['id_menu'] =  $this->id_menu;   
-
-            //$this->jquery->hide('div1');
 
             $data['main_content'] = 'admin/actividad/list';
             $this->load->view('includes/template', $data); 
@@ -171,6 +174,7 @@ class Admin_Actividad extends CI_Controller
 
     public function add()
     {
+        try{
         $tmp['1'] = 'funcion';
         if ($this->menus->permiso_funcion($this->instancia($tmp))) {
             $val = null;
@@ -257,11 +261,16 @@ class Admin_Actividad extends CI_Controller
             $p_error['message'] = 'Permisos insuficientes para. '.$this->router->fetch_class();
             $p_error['menu'] = $this->menus->menu_usuario($this->session->userdata('user_rol_id'));
             $this->menus->errors($p_error);   
+        }
+        }catch(Exception $e){
+            show_error($e->getMessage().'---'.$e->getTraceAsString());
         }   
     }
 
     public function update()
     { 
+        try{
+
         $varG = null;
         $id = $this->uri->segment(4);
         if ($this->input->server('REQUEST_METHOD') === 'POST')
@@ -339,6 +348,10 @@ class Admin_Actividad extends CI_Controller
                                                                 $this->session->userdata('user_rol'));
             $data['main_content'] = 'admin/actividad/edit';
             $this->load->view('includes/template', $data); 
+
+        }catch(Excepcion $e){   
+            show_error($e->getMessage().'---'.$e->getTraceAsString());
+        }
     }
 
     public function addSub(){ 
@@ -399,27 +412,40 @@ class Admin_Actividad extends CI_Controller
         echo $hint ==="" ? "0, Error al configurar sub actividad!":$hint;
     }
 
+    public function deleteActividad(){
+        try{
+            $id = $_REQUEST["id"];
+
+            $this->sub_actividad_model->deleteXactividad($id);
+            $this->integrante_model->deleteXactividad($id);
+            $this->actividad_model->delete($id);
+        
+        }catch(Excepciones $e){
+             show_error($e->getMessage().'---'.$e->getTraceAsString());
+        }
+    }
+
     public function delete()
     {
-        //$idActividad = $this->menu(FALSE);
-        $idActividad = $this->uri->segment(4);
-        if($this->sub_actividad_model->getXactividad($idActividad) === 0){
-            $tmp['1'] = "funcion";
+        try{
+            $idActividad = $this->uri->segment(4);
+            $data['subActividad'] = $this->sub_actividad_model->getXactividad($idActividad);
 
-            if($this->menus->permiso_funcion($this->instancia($tmp))){
+            if($data['subActividad'] <= 0){
+                $tmp['1'] = "funcion";
                 $id = $this->uri->segment(4);
-                //$this->actividad_model->delete($id);
-                //redirect('index.php/adminapp/admin_actividad/');
-
-                $data['idSub'] = 0;
-
+                $this->integrante_model->deleteXactividad($id);
+                $this->actividad_model->delete($id);
+            
+                $this->session->set_flashdata('flash_message', 'delete');
+                redirect('index.php/adminapp/admin_actividad/');
+            }else{
+                $this->session->set_flashdata('flash_message', 'Nodelete');
+                $this->session->set_flashdata('idActividad',$idActividad);
+                redirect('index.php/adminapp/admin_actividad/');
             }
-            echo 'no tiene';
-        }else{
-            echo 'tiene sub';
-            $this->jquery->hide('div1');
-
-            $data['idSub'] = 1;
+        }catch(Excepcion $e){
+            show_error($e->getMessage().'---'.$e->getTraceAsString());
         }
     }
 

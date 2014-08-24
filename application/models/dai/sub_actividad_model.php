@@ -36,6 +36,16 @@ class Sub_Actividad_Model extends CI_model
 		}
 	}
 
+	public function delete($id){
+		$this->db->where('id', $id);
+		$this->db->delete($this->tbl_subActividad); 
+	}
+
+	public function deleteXactividad($id){
+		$this->db->where('actividad_id', $id);
+		$this->db->delete($this->tbl_subActividad);
+	}
+
 	function get_by_id_sub($id){
 		$campo = array (
 			'sub_actividad.id as idS',
@@ -70,17 +80,17 @@ class Sub_Actividad_Model extends CI_model
 		$this->db->where('sub_actividad.actividad_id', $idActividad);
 
 		$query = $this->db->get();
-		return $query->result_array();
+		return $query->num_rows();
 	}
 
 	function get_all_sub($search_string=null, $order=null, $order_type='Asc', $limit_start, $limit_end){
 		$campo = array (
-			'sub_actividad.id as idS',
-			'sub_actividad.descripcion as descripcion',
-			'sub_actividad.fecha_inicio as fecha_inicio',
-			'sub_actividad.fecha_fin as fecha_fin',
-			'sub_actividad.observacion as observacion',
-			'actividad.descripcion as nombreA');
+			'sub_actividad.id as id',
+			'sub_actividad.descripcion as "Descripción"',
+			'sub_actividad.fecha_inicio as "Fecha inicio"',
+			'sub_actividad.fecha_fin as "Fecha fin"',
+			'sub_actividad.observacion as "Observación"',
+			'actividad.descripcion as Actividad');
 		$this->db->select($campo);
 		$this->db->from($this->tbl_subActividad);
 		$this->db->join('actividad','sub_actividad.actividad_id = actividad.id','inner');
@@ -124,24 +134,6 @@ class Sub_Actividad_Model extends CI_model
 	}
 
 	function subActividadRealizadas($idA , $idG){
-		/*$campos = array(
-			'sub_actividad.id as IdSub',
-			'sub_actividad.descripcion as Descripcion',
-			'sub_actividad.fecha_inicio as FechaInicio',
-			'sub_actividad.fecha_fin as FechaFin',
-			'sub_actividad.observacion as Observacion',
-			'sub_actividad.actividad_id as IdActividad',
-			'sub_actividad.estado as Estado');
-		$this->db->select($campos);
-		$this->db->from($this->tbl_SubActividad);
-		$this->db->join('actividad','sub_actividad.actividad_id = actividad.id','inner');
-		$this->db->join('grupo','actividad.grupo_id = grupo.id','inner');
-		$this->db->where('grupo.id = ',$idG and 'sub_actividad.estado = 2');
-		//$this->db->and('sub_actividad.estado = 1');
-
-		$query = $this->db->get();
-		return $query->num_rows();
-	*/
 		$result = $this->db->query('SELECT sub_actividad.id,sub_actividad.descripcion from sub_actividad 
 		inner join actividad on sub_actividad.actividad_id = actividad.id 
 		inner join grupo on actividad.grupo_id = grupo.id

@@ -150,7 +150,7 @@
               <label for="subobservacion" class="col-lg-2 control-label">Observaciones:</label>
               <div class="col-lg-8">
                 <textarea class="form-control" id="subobservacion" rows="3" name="subobservacion"
-                placeholder="Escriba las Observaciones de la Actividad" style="resize:none" maxlength="500"
+                placeholder="Escriba las observaciones de la actividad" style="resize:none" maxlength="500"
                 value=""><?php echo set_value('subobservacion'); ?></textarea>
               </div>
             </div>
