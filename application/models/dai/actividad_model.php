@@ -91,14 +91,14 @@ class Actividad_Model extends CI_model
 
  	public function get_all($search_string=null, $order=null, $order_type='Asc', $limit_start, $limit_end){
 		$campo = array (
-			'actividad.id as idA',
-			'actividad.descripcion as descripcion',
-			'actividad.fecha_inicio as fecha_inicio',
-			'actividad.fecha_fin as fecha_fin',
-			'responsable.duracion as duracion',
-			'concat_ws(" ",usuario.nombre,usuario.apellido) as nombreU',
-			'grupo.nombre_grupo as nombreG',
-			'actividad.observacion as observacion');
+			'actividad.id as id',
+			'actividad.descripcion as "Descripción"',
+			'actividad.fecha_inicio as "Fecha inicio"',
+			'actividad.fecha_fin as "Fecha fin"',
+			'responsable.duracion as "Duración"',
+			'grupo.nombre_grupo as Grupo',
+			'concat_ws(" ",usuario.nombre,usuario.apellido) as Responsable',
+			'actividad.observacion as "Observación"');
 		$this->db->select($campo);
 		$this->db->from($this->tb_responsable);
 		$this->db->join('integrante','responsable.integrante_id = integrante.id','inner');

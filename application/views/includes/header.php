@@ -5,6 +5,7 @@
 <head>
   <title>PP GRADO</title>
   <link href="<?php echo base_url(); ?>assets/css/admin/global.css" rel="stylesheet" type="text/css">
+  <script src="<?php echo base_url(); ?>assets/js/jquery-1.7.1.min.js"></script>
 </head>
 <body>
 <nav class="navbar-wrapper navbar-default navbar-fixed-top navbar-inverse" role="navigation">

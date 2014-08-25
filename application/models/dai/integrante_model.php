@@ -241,5 +241,10 @@ class Integrante_model extends CI_model
 		else
 			return 0;
 	}
+
+	public function deleteXActividad($id){
+		$this->db->where('actividad_id', $id);
+		$this->db->delete($this->tbl_responsable);
+	}
 }
 ?>

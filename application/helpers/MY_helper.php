@@ -66,7 +66,7 @@ function mensaje_response($p_error, $target ){
             '" class="btn btn-default btn-lg"><span class="glyphicon glyphicon-edit"></span></a>' ; 
         }
         if ($p_permiso['ELIMINAR']) {
-          $respons .= '<a href="'.
+          $respons .= '<a id="btnDelete"  href="'.
               $parametros['site_url'].'/'.$parametros['segment'].'/delete/'.$key['id'].
             '" class="btn btn-default btn-lg">'.
               '<span class="glyphicon glyphicon-remove-sign"></span></a></td>';

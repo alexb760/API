@@ -156,6 +156,12 @@ class Admin_Actividad extends CI_Controller
                 $config['total_rows'] = $data['count_products'];
 
             }
+                $var = $this->session->flashdata('idActividad');
+                if($var !== ""){
+                    $data['idActividad'] = $var;
+                }else{
+                    $data['idActividad'] = 0;
+                }
             $this->pagination->initialize($config);
             $data['menu']= $this->menus->menu_usuario($this->session->userdata('user_rol_id'));
             $data['submenu'] = $this->menus->render_submenu();
@@ -168,6 +174,7 @@ class Admin_Actividad extends CI_Controller
 
     public function add()
     {
+        try{
         $tmp['1'] = 'funcion';
         if ($this->menus->permiso_funcion($this->instancia($tmp))) {
             $val = null;
@@ -254,12 +261,18 @@ class Admin_Actividad extends CI_Controller
             $p_error['message'] = 'Permisos insuficientes para. '.$this->router->fetch_class();
             $p_error['menu'] = $this->menus->menu_usuario($this->session->userdata('user_rol_id'));
             $this->menus->errors($p_error);   
+        }
+        }catch(Exception $e){
+            show_error($e->getMessage().'---'.$e->getTraceAsString());
         }   
     }
 
     public function update()
     { 
+        try{
+
         $varG = null;
+        $id = $this->uri->segment(4);
         if ($this->input->server('REQUEST_METHOD') === 'POST')
         {
             $this->form_validation->set_rules('descripcion', 'nombre', 'trim|required|min_length[3]|max_length[200]');
@@ -299,33 +312,46 @@ class Admin_Actividad extends CI_Controller
                 }else{
                     $this->session->set_flashdata('flash_message', 'not_updated');
                 }
-                redirect('index.php/adminapp/admin_actividad/update/?ael='.$_GET['ael']);
+                //redirect('index.php/adminapp/admin_actividad/update/?ael='.$_GET['ael']);
+                redirect('index.php/adminapp/admin_actividad/update/'.$id);
             }else{
                 $varG = $this->input->post('grupo');
                 $data['grupoV'] = $varG;
                 $data['responsableV'] = $this->input->post('responsable');
             }
         }
-            $id = $this->menu(FALSE);
+            //$id = $this->menu(FALSE);
 
+        if($varG === NULL){
             if($id !== NULL){
+                echo $id.'id';
                 $this->session->set_flashdata('idActividad', $id);
                 $data['product'] = $this->actividad_model->get_by_id_edit($id); //id actividad
                 $data['integrantes'] = $this->integrante_model->get_by_id_grupo($data['product'][0]['idG']);//id del grupo
-                $data['url'] = $_GET['ael'];
+                $data['url'] = $id;//$_GET['ael'];
                 $this->session->set_flashdata('idResponsable',$data['product'][0]['IdResponsable']);
-            }else{
+            }
+        }else{
                 $idR = $this->session->flashdata('idResponsable');
                 $this->session->set_flashdata('idResponsable',$idR);
                 $data['product'] = NULL;
                 $data['integrantes'] = $this->integrante_model->get_by_id_grupo($varG);
-                $data['url'] = $_GET['ael'];
+                $data['url'] = $id;//$_GET['ael'];
                 $userLogin = $this->session->userdata('user_name');
                 $data['grupo'] = $this->grupo_model->getxUsuario($userLogin);
             }
-            
+
+            $data['menu']= $this->menus->menu_usuario($this->session->userdata('user_rol_id'));
+            $data['op_submenu'] = $this->menus->render_submenu();
+            $data['options_rol'] = $this->usuario_model->get_rol_option(
+                                                                $this->session->userdata('user_rol_id'),
+                                                                $this->session->userdata('user_rol'));
             $data['main_content'] = 'admin/actividad/edit';
             $this->load->view('includes/template', $data); 
+
+        }catch(Excepcion $e){   
+            show_error($e->getMessage().'---'.$e->getTraceAsString());
+        }
     }
 
     public function addSub(){ 
@@ -386,13 +412,42 @@ class Admin_Actividad extends CI_Controller
         echo $hint ==="" ? "0, Error al configurar sub actividad!":$hint;
     }
 
+    public function deleteActividad(){
+        try{
+            $id = $_REQUEST["id"];
+
+            $this->sub_actividad_model->deleteXactividad($id);
+            $this->integrante_model->deleteXactividad($id);
+            $this->actividad_model->delete($id);
+        
+        }catch(Excepciones $e){
+             show_error($e->getMessage().'---'.$e->getTraceAsString());
+        }
+    }
+
     public function delete()
     {
-        //product id 
-        $id = $this->uri->segment(4);
-        $this->products_model->delete_product($id);
-        redirect('admin/products');
-    }//edit
+        try{
+            $idActividad = $this->uri->segment(4);
+            $data['subActividad'] = $this->sub_actividad_model->getXactividad($idActividad);
+
+            if($data['subActividad'] <= 0){
+                $tmp['1'] = "funcion";
+                $id = $this->uri->segment(4);
+                $this->integrante_model->deleteXactividad($id);
+                $this->actividad_model->delete($id);
+            
+                $this->session->set_flashdata('flash_message', 'delete');
+                redirect('index.php/adminapp/admin_actividad/');
+            }else{
+                $this->session->set_flashdata('flash_message', 'Nodelete');
+                $this->session->set_flashdata('idActividad',$idActividad);
+                redirect('index.php/adminapp/admin_actividad/');
+            }
+        }catch(Excepcion $e){
+            show_error($e->getMessage().'---'.$e->getTraceAsString());
+        }
+    }
 
     public function menu($bandera){
         if($bandera){
