@@ -324,7 +324,6 @@ class Admin_Actividad extends CI_Controller
 
         if($varG === NULL){
             if($id !== NULL){
-                echo $id.'id';
                 $this->session->set_flashdata('idActividad', $id);
                 $data['product'] = $this->actividad_model->get_by_id_edit($id); //id actividad
                 $data['integrantes'] = $this->integrante_model->get_by_id_grupo($data['product'][0]['idG']);//id del grupo

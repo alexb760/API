@@ -219,12 +219,15 @@ class Integrante_model extends CI_model
 	}
 
 
-	function updateResponsable($IdResponsable, $IdIntegrante, $duracion)
+	public function updateResponsable($IdResponsable, $IdIntegrante)
 	{
-		$this->db->query('UPDATE responsable
-						  SET integrante_id ='.$IdIntegrante.','.
-						  'duracion ='.$duracion.
-						 ' WHERE responsable.id ='.$IdResponsable);
+		/*$this->db->where('id', $IdResponsable);
+		$this->db->update($this->tbl_responsable, 'integrante_id', $IdIntegrante);*/
+
+		$this->db->query('UPDATE responsable'.
+						' set integrante_id = '.$IdIntegrante.
+						' WHERE id = '. $IdResponsable);
+
 		$report = array();
 		$report['error'] = $this->db->_error_number();
 		$report['message'] = $this->db->_error_message();

@@ -30,13 +30,13 @@ class Actividad_Realizada_Model extends CI_model
 
 	function get_all($search_string=null, $order=null, $order_type='Asc', $limit_start, $limit_end){
 		$campo = array (
-			'actividad_realizada.id as idR',
-			'actividad_realizada.fecha_fin as fecha_fin',
-			'actividad_realizada.observacion as observacion',
-			'concat_ws(" ",usuario.nombre,usuario.apellido) as nombreU',
-			'actividad_realizada.ejecutada as ejecutada',
+			'actividad_realizada.id as id',
+			'actividad_realizada.fecha_fin as "Fecha fin"',
+			'actividad_realizada.observacion as "Observación"',
+			'concat_ws(" ",usuario.nombre,usuario.apellido) as "Responsable"',
+			//'actividad_realizada.ejecutada as ejecutada',
 			'presupuesto_actividad.valor_gasto as valor',
-			'actividad.descripcion as nombreA');
+			'actividad.descripcion as Actividad');
 		$this->db->select($campo);
 		$this->db->from($this->tbl_ActividadRealizada);
 		$this->db->join('actividad','actividad_realizada.actividad_id = actividad.id','inner');
@@ -167,7 +167,7 @@ class Actividad_Realizada_Model extends CI_model
 
 	function delete($id){
 		$this->db->where('id', $id);
-		$this->db->delete($this->tb_name); 
+		$this->db->delete($this->tbl_ActividadRealizada); 
 	}
 }
 ?>

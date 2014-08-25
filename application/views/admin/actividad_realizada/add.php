@@ -83,7 +83,7 @@
     <div class="form-group">
       <label for="actividad" class="col-lg-2 control-label">Actividad:</label>
       <div class="col-lg-8">
-        <select name="actividad" id="actividad" class="form-control" required>  
+        <select name="actividad" id="actividad" class="form-control" required title="Se requiere la actividad!">  
           <?php 
             if($actividadV !== NULL){
               echo 'ea1';

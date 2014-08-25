@@ -3,20 +3,18 @@
       <ul class="breadcrumb">
         <li>
           <a href="<?php echo site_url("index.php/adminapp"); ?>">
-            <?php echo ucfirst("Inicio"); 
-            //echo ucfirst($this->uri->segment(1));?>
+            <?php echo ucfirst("Inicio"); ?>
           </a> 
           <span class="divider">/</span>
         </li>
         <li>
           <a href="<?php echo site_url("index.php/adminapp").'/'.$this->uri->segment(2); ?>">
-            <?php echo ucfirst("Actividades Realizadas");
-            //echo ucfirst($this->uri->segment(2));?>
+            <?php echo ucfirst("Actividades Realizadas");?>
           </a> 
           <span class="divider">/</span>
         </li>
         <li class="active">
-          <a href="#">Update</a>
+          <a href="#">Actualizar</a>
         </li>
       </ul>
       
