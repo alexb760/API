@@ -50,11 +50,11 @@ class Admin_Proyecto_investigacion extends CI_Controller
         $order = $this->input->post('order'); 
         $order_type = $this->input->post('order_type'); 
 
-        $config['per_page'] = 7;
+        $config['per_page'] = 2;
         $config['base_url'] = base_url().'index.php/adminapp/admin_proyecto_investigacion/index/';
         $config['use_page_numbers'] = TRUE;
         $config['num_links'] = 20;
-        $config['full_tag_open'] = '<ul>';
+        $config['full_tag_open'] = '<ul class= "pagination">';
         $config['full_tag_close'] = '</ul>';
         $config['num_tag_open'] = '<li>';
         $config['num_tag_close'] = '</li>';
@@ -172,6 +172,7 @@ class Admin_Proyecto_investigacion extends CI_Controller
         $this->pagination->initialize($config);   
 
         //load the view
+        $data['menu']= $this->menus->menu_usuario($this->session->userdata('user_rol_id')); 
         $data['main_content'] = 'admin/proyecto_investigacion/list';
         $this->load->view('includes/template', $data); 
     }
@@ -187,7 +188,6 @@ class Admin_Proyecto_investigacion extends CI_Controller
             $this->form_validation->set_rules('descripcion', 'descripcion', 'required');
             $this->form_validation->set_rules('sigla','sigla','required|min_length[2]|is_unique[proyecto_investigacion.sigla]');
             $this->form_validation->set_rules('objetivo','objetivo','required|min_length[5]');
-            $this->form_validation->set_rules('linea_investigacion','linea investigacion','required');
             $this->form_validation->set_rules('grupo','grupo','required');
             //$this->form_validation->set_rules('upload_file','upload_file','required');
             $this->form_validation->set_error_delimiters('<div class="alert alert-danger"><a class="close danger" data-dismiss="alert">&times</a><strong>', '</strong></div>');
@@ -195,33 +195,33 @@ class Admin_Proyecto_investigacion extends CI_Controller
             //if the form has passed through the validation
             if ($this->form_validation->run())
             {
-               // $params['file']     = $this->input->post('upload_file');
                 $params['dir_user'] = $this->input->post('sigla');
                 $params['file']     = 'upload_file';#nombre del campo type=file.
 
                 $data['flash_message'] = $this->menus->upload_file($params);
                 if($data['flash_message']['status']){
 
-                $data_to_store = array(
-                    'nombre_pro'    => $this->input->post('nombre_pro'),
-                    'descripcion'   => $this->input->post('descripcion'),
-                    'sigla'         => $this->input->post('sigla'),
-                    'objetivo'      => $this->input->post('objetivo'),
-                    'fecha_creacion'=> date('Y-m-d H:m:s'),
-                    'grupo_id'      => $this->input->post('grupo'),
-                    'path_documento'=> '' 
-                    );
-                $data_to_store_linea_grupo = array(
-                     'linea_investigacion_id'   => $this->input->post('linea_investigacion'),
-                     'grupo_id'                 => $this->input->post('grupo'),
-                    );
-                //if the insert has returned true then we show the flash message
-                if($this->proyecto_investigacion_model->add($data_to_store)){
-                    $data['flash_message'] = TRUE; 
-                }else{
-                    $data['flash_message'] = FALSE; 
+                    $data_to_store = array(
+                        'nombre_pro'    => $this->input->post('nombre_pro'),
+                        'descripcion'   => $this->input->post('descripcion'),
+                        'sigla'         => $this->input->post('sigla'),
+                        'objetivo'      => $this->input->post('objetivo'),
+                        'fecha_creacion'=> date('Y-m-d H:m:s'),
+                        'grupo_id'      => $this->input->post('grupo'),
+                        'path_documento'=> $data['flash_message']['info']['file_name']
+                        );
+                        $file ='Documento: '.$data['flash_message']['info']['file_name'].'<br>';
+                        $file .='Tipo: '.$data['flash_message']['info']['file_type'].'<br>';
+                        $file .='Peso: '.$data['flash_message']['info']['file_size'].'<br>';
+                    $data['flash_message']['info'] = $file; 
+                    //if the insert has returned true then we show the flash message
+                    if($this->proyecto_investigacion_model->add($data_to_store)){
+                        $data['flash_message']['status'] = TRUE;
+                        $data['flash_message']['info'] .= 'Proyecto guardado con Éxito'.'<br>'; 
+                    }else{
+                        $data['flash_message']['status'] = FALSE; 
+                    }
                 }
-            }
             }
         }
 		$grupo_id = 0;
@@ -230,18 +230,19 @@ class Admin_Proyecto_investigacion extends CI_Controller
         }
         //fetch manufactures data to populate the select field
         //$data['manufactures'] = null; //$this->linea_investigacion_model->get_manufacturers();
-         $data['lineas'] = $this->linea_investigacion_model->get_list_lineas();
          if($grupo_id == 0)
             $data['grupos'] = $this->grupo_model->get_all_();
         else
             $data['grupos'] = $this->grupo_model->get_by_id($grupo_id);
         //load the view
+        $data['menu']= $this->menus->menu_usuario($this->session->userdata('user_rol_id')); 
         $data['main_content'] = 'admin/proyecto_investigacion/add';
         $this->load->view('includes/template', $data);  
     }
 
     public function update()
     {
+        try{
         //product id 
         $id = $this->uri->segment(4);
 
@@ -250,31 +251,47 @@ class Admin_Proyecto_investigacion extends CI_Controller
         //if save button was clicked, get the data sent via post
         if ($this->input->server('REQUEST_METHOD') === 'POST')
         {
-            //form validation
-            $this->form_validation->set_rules('description', 'description', 'required');
-            $this->form_validation->set_rules('stock', 'stock', 'required|numeric');
-            $this->form_validation->set_rules('cost_price', 'cost_price', 'required|numeric');
-            $this->form_validation->set_rules('sell_price', 'sell_price', 'required|numeric');
-            $this->form_validation->set_rules('manufacture_id', 'manufacture_id', 'required');
-            $this->form_validation->set_error_delimiters('<div class="alert alert-error"><a class="close" data-dismiss="alert">×</a><strong>', '</strong></div>');
+            $this->form_validation->set_rules('nombre_pro', 'nombre', 'required|min_length[5]');
+            $this->form_validation->set_rules('descripcion', 'descripcion', 'required');
+            $this->form_validation->set_rules('sigla','sigla','required|min_length[2]');
+            $this->form_validation->set_rules('objetivo','objetivo','required|min_length[5]');
+            //$this->form_validation->set_rules('upload_file','upload_file','required');
+            $this->form_validation->set_error_delimiters('<div class="alert alert-danger"><a class="close danger" data-dismiss="alert">&times</a><strong>', '</strong></div>');
             //if the form has passed through the validation
+
             if ($this->form_validation->run())
-            {
-    
+            { 
+                $params['dir_user'] = $this->input->post('sigla');
+                $params['file']     = 'upload_file';#nombre del campo type=file.
+
+                $data['flash_message'] = $this->menus->upload_file($params);
+
+                if($data['flash_message']['status']){
+
                 $data_to_store = array(
-                    'description' => $this->input->post('description'),
-                    'stock' => $this->input->post('stock'),
-                    'cost_price' => $this->input->post('cost_price'),
-                    'sell_price' => $this->input->post('sell_price'),          
-                    'manufacture_id' => $this->input->post('manufacture_id')
-                );
-                //if the insert has returned true then we show the flash message
-                if($this->products_model->update_product($id, $data_to_store) == TRUE){
-                    $this->session->set_flashdata('flash_message', 'updated');
-                }else{
-                    $this->session->set_flashdata('flash_message', 'not_updated');
+                        'nombre_pro'    => $this->input->post('nombre_pro'),
+                        'descripcion'   => $this->input->post('descripcion'),
+                        'sigla'         => $this->input->post('sigla'),
+                        'objetivo'      => $this->input->post('objetivo'),
+                        'path_documento'=> $data['flash_message']['info']['file_name']
+                        );
+
+                        $file ='Documento: '.$data['flash_message']['info']['file_name'].'<br>';
+                        $file .='Tipo: '.$data['flash_message']['info']['file_type'].'<br>';
+                        $file .='Peso: '.$data['flash_message']['info']['file_size'].'<br>';
+
+                    $data['flash_message']['info'] = $file; 
+                    //if the insert has returned true then we show the flash message
+                    if($this->proyecto_investigacion_model->update_proyecto($id, $data_to_store)){
+                        $data['flash_message']['status'] = TRUE;
+                        $data['flash_message']['message'] .= ' Proyecto guardado con Éxito'.'<br>';
+                         $this->session->set_flashdata('flash_message', $data['flash_message']); 
+                    }else{
+                        $data['flash_message']['status'] = FALSE;
+                        $this->session->set_flashdata('flash_message', $data['flash_message']);  
+                    }
                 }
-                redirect('admin/products/update/'.$id.'');
+                redirect('index.php/adminapp/admin_proyecto_investigacion/update/'.$id.'');
 
             }//validation run
 
@@ -285,19 +302,13 @@ class Admin_Proyecto_investigacion extends CI_Controller
 
         //product data 
         $data['product'] = $this->proyecto_investigacion_model->get_by_id($id);
-
-        foreach ($data['product'] as $row) {
-            $line = $row['linea'];
-            $group = $row['grupo'];
-        }
-        $data['linea'] = $this->linea_investigacion_model->get_by_id($line);
-        $data['lineas'] = $this->linea_investigacion_model->get_all_();
-        $data['grupo'] = $this->grupo_model->get_by_id($group);
-        $data['grupos'] = $this->grupo_model->get_all_();
-
         //load the view
+        $data['menu']= $this->menus->menu_usuario($this->session->userdata('user_rol_id'));
         $data['main_content'] = 'admin/proyecto_investigacion/edit';
-        $this->load->view('includes/template', $data);            
+        $this->load->view('includes/template', $data); 
+        }catch(Exception $e){
+          show_error($e->getMessage().' --- '.$e->getTraceAsString());
+        } 
 
     }//update
 

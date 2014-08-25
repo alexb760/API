@@ -127,17 +127,20 @@ function get_all_(){
 				'grupo.grupo_id  AS Grupo_padre',
 				'grupo.avalado_col AS Avalado_Colciencia',
 				'grupo.clasificacion AS Clasificacion',
-				'grupo.pagina_web AS Web',
+				'CONCAT("<a target=_blank href='.prep_url(auto_link('",grupo.pagina_web,"'.'>",grupo.pagina_web,"</a>"').') AS Web'),
 				'grupo.correo AS Correo',
 				'grupo.fecha_creacion AS Fecha_Creado',
-				'grupo.path_colciencias AS Colciencas',
+				'CONCAT("<a target=_blank href='.prep_url(auto_link('",grupo.path_colciencias,"'.'>",grupo.path_colciencias,"</a>"').') AS Colciencias'),
 				'estado.descripcion AS Estado',
-				'estado.observacion AS Observacion'
+				'estado.observacion AS Observacion',
+				'linea_investigacion.linea'
 				);
-		$this->db->select($campo);
+		$this->db->select($campo, true);
 		$this->db->from($this->tb_name);
 		$this->db->join('estado','estado.id = grupo.estado_id or  grupo.estado_id = null','inner');
 		$this->db->join('integrante','integrante.grupo_id = grupo.id','inner');
+		$this->db->join('lineas_grupo','grupo.id = lineas_grupo.grupo_id','inner');
+		$this->db->join('linea_investigacion','lineas_grupo.linea_investigacion_id = linea_investigacion.id','inner');
 		$this->db->where('integrante.usuario_id', $this->session->userdata('id_user'));
 		$this->db->where('integrante.is_asesor',1);
 			
@@ -172,8 +175,30 @@ function get_all_(){
 	*/
 	function count($estado_id=null, $search_string=null)
 	{
-		$this->db->select('*');
-		$this->db->from('grupo');
+		$campo = array(
+				'grupo.id',
+				'grupo.nombre_grupo AS Nombre',
+				'grupo.sigla As Sigla',
+				'grupo.semillero AS Semillero',
+				'grupo.grupo_id  AS Grupo_padre',
+				'grupo.avalado_col AS Avalado_Colciencia',
+				'grupo.clasificacion AS Clasificacion',
+				'CONCAT("<a target=_blank href='.prep_url(auto_link('",grupo.pagina_web,"'.'>",grupo.pagina_web,"</a>"').') AS Web'),
+				'grupo.correo AS Correo',
+				'grupo.fecha_creacion AS Fecha_Creado',
+				'CONCAT("<a target=_blank href='.prep_url(auto_link('",grupo.path_colciencias,"'.'>",grupo.path_colciencias,"</a>"').') AS Colciencias'),
+				'estado.descripcion AS Estado',
+				'estado.observacion AS Observacion',
+				'linea_investigacion.linea'
+				);
+		$this->db->select($campo, true);
+		$this->db->from($this->tb_name);
+		$this->db->join('estado','estado.id = grupo.estado_id or  grupo.estado_id = null','inner');
+		$this->db->join('integrante','integrante.grupo_id = grupo.id','inner');
+		$this->db->join('lineas_grupo','grupo.id = lineas_grupo.grupo_id','inner');
+		$this->db->join('linea_investigacion','lineas_grupo.linea_investigacion_id = linea_investigacion.id','inner');
+		$this->db->where('integrante.usuario_id', $this->session->userdata('id_user'));
+		$this->db->where('integrante.is_asesor',1);
 		if($estado_id != null && $estado_id != 0){
 			$this->db->where('estado_id', $estado_id);
 		}

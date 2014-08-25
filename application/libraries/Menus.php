@@ -214,7 +214,9 @@ function permiso_funcion($p_array){
             if(isset($param['attach']))
                 $this->ci->email->attach($param['attach']);
 
-            $this->ci->email->message((isset($param['message'])? $param['message'] : 'Mensaje del Sistema'));
+            $this->ci->email->message((isset($param['message'])? 
+                    (is_array($param['message']) ? $this->body_mail($param['message']) : 
+                      $param['message'] ) : 'Mensaje del Sistema'));
             if(!$this->ci->email->send()){
                 $result['status'] = FALSE;
                 $formato = 'Esto es extraño.'.'\n'.' no se ha enviado ningún mensaje ha %s ';
@@ -236,7 +238,12 @@ function permiso_funcion($p_array){
 
   private function body_mail($p_mensaje){
     try {
-      
+      $body = '<pre style="text-align:left; font-family:Arial, Helvetica, sans-serif; font-size:14px; color:#666666; background: #f9fee8;">';
+      foreach ($p_mensaje as $key => $value) {
+        $body .= '<strong style="color: #9caa6d; text-decoration:none;">'.$key.' '.'</strong><em>'.$value.'</em><br>';
+      }
+      $body .= '</pre>';
+      return $body;
     } catch (Exception $e) {
       show_error($e->getMessage().' --- '.$e->getTraceAsString());
     }
@@ -271,12 +278,14 @@ public function upload_file($params){
       $info = '';
       $file_element_name = $params['file'];
       $dir_user = $params['dir_user'];
-      echo $params['file'].'antes de crear directoio';
-    if(!is_dir('/uploads/grupos/'. $dir_user)){
-            @mkdir('/uploads/grupos/'.$dir_user);
+    if(!is_dir(dirname($_SERVER["SCRIPT_FILENAME"]).'/assets/uploads/grupos/'. $dir_user)){
+            if(@mkdir(dirname($_SERVER["SCRIPT_FILENAME"]).'/assets/uploads/grupos/'.$dir_user))
+                echo 'Directorio creado';
+              else
+                echo 'directorio no creado';
       }
           //$config['upload_path'] = dirname($_SERVER["SCRIPT_FILENAME"])."/assets/uploads/grupos/'";
-          $config['upload_path'] = './assets/uploads/grupos';
+          $config['upload_path'] = './assets/uploads/grupos/'.$dir_user;
           //$config['upload_url'] = base_url()."/assets/uploads/grupos/";
           //$config['upload_path'] = './uploads/grupos/'.$dir_user;
           $config['allowed_types'] = 'doc|docx|pdf|txt|xsl|xslx|html|odf|rar|zip|7zip';
@@ -296,7 +305,7 @@ public function upload_file($params){
                         if ($insertFile) {  // File was added correctly to DB
                             $status = TRUE;
                             $message = 'Archivo enviado con Éxito!';
-                            $info = implode(' | ', $data);
+                            $info = $data;
                         } else {    // Record wasnt added to DB
                             unlink($data['full_path']); # Deletes the File
                             $status = FALSE;
@@ -304,9 +313,6 @@ public function upload_file($params){
                             $info = '';
                         }
                     }
-                    //@unlink($_FILES[$file_element_name]);
-            //$json_encode = json_encode(array('message' => $message, 'status' => $status, 'background' => $background));
-            //echo $json_encode; 
       return array('message' => $message, 'status' => $status, 'info' => $info);
     } catch (Exception $e){
       show_error($e->getMessage().' --- '.$e->getTraceAsString());

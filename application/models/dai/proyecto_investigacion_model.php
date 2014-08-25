@@ -55,18 +55,15 @@ class Proyecto_investigacion_model extends CI_Model
 */
 	function get_by_id($id){
 		$campo = array(
-			'proyecto_investigacion.id as idP',
+			'proyecto_investigacion.id as id',
 			'proyecto_investigacion.nombre_pro AS nombre_pro',
 			'proyecto_investigacion.descripcion as descripcion',
 			'proyecto_investigacion.sigla as sigla',
-			'proyecto_investigacion.objetivo as objetivo',
-			'proyecto_investigacion.fecha_creacion as fecha_creacion',
-			'proyecto_investigacion.fecha_caducado as fecha_caducado',
-			'proyecto_investigacion.linea_investigacion_id as linea',
-			'proyecto_investigacion.grupo_id as grupo');
+			'proyecto_investigacion.objetivo as objetivo'
+			);
 		$this->db->select($campo);
 		$this->db->from($this->tb_name);
-		$this->db->where('id', $id);
+		$this->db->where('proyecto_investigacion.id', $id);
 		$query = $this->db->get();
 		return $query->result_array(); 
 	}
@@ -96,13 +93,14 @@ class Proyecto_investigacion_model extends CI_Model
 	function get_proyecto($search_string=null, $order=null, $order_type='Asc', $limit_start, $limit_end){
 		
 			$campo = array(
-				'proyecto_investigacion.id as idP',
+				'proyecto_investigacion.id',
 				'proyecto_investigacion.nombre_pro AS Proyecto',
 				'proyecto_investigacion.descripcion AS Detalle',
 				'proyecto_investigacion.sigla AS Sigla',
 				'proyecto_investigacion.objetivo AS Objetivo',
 				'proyecto_investigacion.fecha_creacion',
 				'proyecto_investigacion.fecha_caducado',
+				'CONCAT(proyecto_investigacion.sigla , "/",proyecto_investigacion.path_documento) AS Documento',
 				'grupo.nombre_grupo'
 				);
 			$this->db->select($campo);
@@ -205,15 +203,13 @@ class Proyecto_investigacion_model extends CI_Model
     function update_proyecto($id, $data)
     {
 		$this->db->where('id', $id);
-		$this->db->update($this->tb_name, $data);
-		$report = array();
+		return $this->db->update($this->tb_name, $data);
+		/*$report = array();
 		$report['error'] = $this->db->_error_number();
 		$report['message'] = $this->db->_error_message();
-		if($report !== 0){
+		if($report['error'] !== 0){
 			return true;
-		}else{
-			return false;
-		}
+		}*/
 	}
 
     /**

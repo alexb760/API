@@ -14,6 +14,7 @@ class Admin_grupo extends CI_Controller
 		$this->load->model('dai/grupo_model');
         $this->load->model('dai/facultad_model');
         $this->load->model('dai/integrante_model');
+        $this->load->model('dai/linea_investigacion_model');
 
 		if (!$this->session->userdata('is_logged_in')) {
 			redirect('index.php/main/index');
@@ -206,6 +207,7 @@ class Admin_grupo extends CI_Controller
                 $this->form_validation->set_rules('sigla', 'sigla', 'required|min_length[2]|is_unique[grupo.sigla]');
                 $this->form_validation->set_rules('correo', 'correo', 'required|min_length[2]|is_unique[grupo.correo]');
                 $this->form_validation->set_rules('facultad', 'facultad', 'required');
+                $this->form_validation->set_rules('linea_investigacion','linea investigacion','required');
 
                 $this->form_validation->set_error_delimiters('<p class="alert alert-danger"><a class="close" data-dismiss="alert">&times;</a><strong>', '</strong></p>');
 
@@ -230,12 +232,17 @@ class Admin_grupo extends CI_Controller
                             'activo'     => 1,
                             'is_asesor'  => 1,
                             'facultad_id'=> (int) $this->input->post('facultad'), );
+
+                    $data_to_store_linea_grupo = array(
+                         'linea_investigacion_id'   => $this->input->post('linea_investigacion'),
+                         'grupo_id'                 => $id_grupo
+                        );
+                    $this->linea_investigacion_model->add_grupo($data_to_store_linea_grupo);
                     //if the insert has returned true then we show the flash message
                     if($this->integrante_model->add($data_acesor_grupo)){
-
                             $param['from'] =  'alexb760@gmail.com';
                             $param['to'] =   array($data_to_store['correo']);
-                            $param['message'] = $data_to_store['nombre_grupo'].' Ha sido registrado con éxito';
+                            $param['message'] = $data_to_store;
                             $data['flash_message'] = $this->menus->send_mail($param);
                         }
                         else{
@@ -244,10 +251,11 @@ class Admin_grupo extends CI_Controller
                         }
                      }  
                 }
-
             }
             //fetch manufactures data to populate the select field
             $data['manufactures'] = null; //$this->linea_investigacion_model->get_manufacturers();
+            $data['lineas'] = $this->linea_investigacion_model->get_list_lineas();
+            $data['menu']= $this->menus->menu_usuario($this->session->userdata('user_rol_id')); 
             //Obtiene todas las facultades para pintarlas en el combo box
             $data['facultad'] = $this->facultad_model->get_all();
             //load the view 

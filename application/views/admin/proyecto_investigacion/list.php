@@ -47,8 +47,7 @@
             echo form_open('adminapp/admin_proyecto_investigacion', $attributes);
      
               echo form_label('Search:', 'search_string');
-              echo form_input('search_string', $search_string_selected, 'style="width: 170px;
-height: 26px;"');
+              echo form_input('search_string', $search_string_selected, 'style="width: 170px; height: 26px;"');
 
               echo form_label('Filter by manufacturer:', 'manufacture_id');
               echo form_dropdown('manufacture_id', $options_manufacture, $manufacture_selected, 'class="span2"');
@@ -72,7 +71,7 @@ height: 26px;"');
            <?php
            $parametros['site_url'] = site_url("index.php/adminapp");
            $parametros['segment']  = $this->uri->segment(2);
-            echo print_table_vertical($products, $permiso, $parametros);
+            echo print_table_vertical_proyecto($products, $permiso, $parametros);
            ?>
           </tbody>
           <tfooter>
@@ -80,7 +79,9 @@ height: 26px;"');
           </tfooter>
           </table>
       </div>
-          <?php echo '<div class="pagination">'.$this->pagination->create_links().'</div>'; ?>
+          <div class="col-md-12">
+          <?php echo '<div class="pagination">'.($this->pagination->create_links()).'</div>'; ?>
+        </div>
 
       </div>
     </div>

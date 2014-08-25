@@ -117,10 +117,21 @@
   <label for="pagina_web_d" >Página Web Director: </label>
     <input type="url" class="form-control" id="pagina_web_d" name="pagina_web_d"
      placeholder="Digite su página WEB Ejem: http://mipagina.com.co"
-     pattern="https?://.+" 
+     pattern="http?://.+" 
     value="<?php echo set_value('pagina_web_d'); ?>" >
-    <p class="help-block">Link de Colciencias del direcctor, [ Opcional ].</p>
+    <em class="help-block">Link de Colciencias del direcctor, [ Opcional ].</em>
      <span class="help-inline"><?php echo form_error('pagina_web_d'); ?></span>
+  </div>
+    <div class="form-group">
+    <label for="linea_investigacion" class="control-label">Linea Investigacion</label>
+      <select class="form-control" name="linea_investigacion">
+      <?php 
+      echo '<option value="">seleccione</option>';
+      foreach ($lineas as $key) {
+        echo '<option value="'.$key['id'].'">'.$key['linea'].'</option>';
+              } ?>  
+      </select>
+      <?php echo form_error('linea_investigacion'); ?>
   </div>
   </div><?php echo form_close(); ?>
 </fieldset>

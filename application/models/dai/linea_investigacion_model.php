@@ -33,6 +33,10 @@ function add($data){
 		return 	$this->db->insert($this->tb_name,$data) ;				
 }
 
+function add_grupo($data){
+		return 	$this->db->insert('lineas_grupo',$data) ;				
+}
+
  /**
     * Get product by his is
     * @param int $product_id 

@@ -1,8 +1,10 @@
 .DS_Store
 
 application/cache/*
-application/config/database.php
-application/config/config.php
+assets/uploads/grupos/*
+!application/config/database.php
+!application/config/config.php
+!application/config/email.php
 !application/cache/index.html
 !application/cache/.htaccess
 

@@ -91,19 +91,6 @@
             </div>
           </div>
           <div class="form-group">
-            <label for="linea_investigacion" class="col-lg-2 control-label">Linea Investigacion</label>
-            <div class="col-lg-8">
-              <select class="form-control" name="linea_investigacion">
-              <?php 
-              echo '<option value="">seleccione</option>';
-              foreach ($lineas as $key) {
-                echo '<option value="'.$key['id'].'">'.$key['linea'].'</option>';
-              } ?>  
-              </select>
-              <?php echo form_error('linea_investigacion'); ?>
-            </div>
-          </div>
-          <div class="form-group">
             <label for="grupo" class="col-lg-2 control-label">Grupo</label>
             <div class="col-lg-8">
               <select class="form-control" name="grupo" >  

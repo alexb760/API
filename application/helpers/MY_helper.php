@@ -36,6 +36,7 @@ function mensaje_response($p_error, $target ){
         $respons = '<div class="alert alert-warning">';
           $respons .= '<a class="close" data-dismiss="alert">&times;</a>';
           $respons .= '<strong>Ops! </strong>'.$p_error['message'].'<br>'.'no hay de que preocuparse todo ha sigo guardado.';
+          $respons .= (isset($p_error['info'])? '<pre>'.$p_error['info'] .'</pre>': '');
           $respons .= '</div>';
       }
       
@@ -129,6 +130,63 @@ foreach($p_data as $row ) {
 }
   return $respons;   
 }
+
+  function print_table_vertical_proyecto($p_data, $p_permiso, $parametros){
+    if (is_array($p_data) && count($p_data) > 0) {
+    $respons = '<table class="table table-striped table-bordered table-condensed table-hover" >'.
+                '<thead>'.
+                 '<tr>';
+    $respons .=  ($p_permiso['EDITAR'] == FALSE && $p_permiso['ELIMINAR']  == FALSE) ? '' :
+                                                      '<th class="text-center">Acciones</th>';
+    $respons .=  '<th class="text-center">Campos</th>'.
+                  '<th class="text-center">Datos</th>'.
+                '</tr>'.
+                '</thead>'. 
+                '<tbody>';
+     foreach ($p_data as $key) {
+      if (($p_permiso['EDITAR'] == TRUE || $p_permiso['ELIMINAR']  == TRUE)) {
+
+        $respons .= '<tr border="4">';
+        $respons .= '<td rowspan="'. (count($key) + 1) .'" class="crud-actions text-center">';
+        if ($p_permiso['EDITAR'] == TRUE) {
+          $respons .= '<a href="'.$parametros['site_url'].'/'.$parametros['segment'].'/update/'.$key['id'].
+            '" class="btn btn-default btn-lg"><span class="glyphicon glyphicon-edit"></span></a>' ; 
+        }
+        if ($p_permiso['ELIMINAR']) {
+          $respons .= '<a href="'.
+              $parametros['site_url'].'/'.$parametros['segment'].'/delete/'.$key['id'].
+            '" class="btn btn-default btn-lg">'.
+              '<span class="glyphicon glyphicon-remove-sign"></span></a></td>';
+        }
+      }
+        
+         foreach($key as $value => $dato){
+            $respons .= '<tr>';
+            $respons .= '<th>'.$value.'</th>';
+            if($value === 'Documento'){
+              $respons .= '<td>'.
+                '<a href="'.base_url().'assets/uploads/grupos/'.
+                $dato.'" target="_blank" class="btn btn-primary">'.
+                '<span class="glyphicon glyphicon-download-alt">'.
+                '<em> Descargar Documento</em>'.
+                '</td>';
+            }else
+                $respons .= '<td>'. $dato .'</td>';
+            $respons .= '</tr>';
+          }
+          $respons .= '<tr class = "divider"></tr>';
+          $respons .= '</tr>';
+          $respons .= '<tr>';
+          $respons .= '</tr>';
+    }
+    }else{
+      $respons = '<div class="alert bg-warning">'.
+                      '<strong>Opps!: </strong>'.'No hay datos registrados'.'</div>';
+    } 
+      return $respons;                         
+  }
+
+
 
 function encabezado_consulta($p_array){
   $opciones = array();

@@ -27,112 +27,85 @@
  
       <?php
       //flash messages
-      if($this->session->flashdata('flash_message')){
-        if($this->session->flashdata('flash_message') == 'updated')
-        {
-          echo '<div class="alert alert-success">';
-            echo '<a class="close" data-dismiss="alert">×</a>';
-            echo '<strong>Well done!</strong> product updated with success.';
-          echo '</div>';       
-        }else{
-          echo '<div class="alert alert-error">';
-            echo '<a class="close" data-dismiss="alert">×</a>';
-            echo '<strong>Oh snap!</strong> change a few things up and try submitting again.';
-          echo '</div>';          
+     if($this->session->flashdata('flash_message')){
+        $tmp = $this->session->flashdata('flash_message');
+        echo mensaje_response($tmp, '');
         }
-      }
       ?>
       
+      
       <?php
-      //form data
+      //form data   , 'enctype'=>'multipart/form-data'
       $attributes = array('class' => 'form-horizontal', 'id' => '');
-      $options_manufacture = array('' => "Select");
-      //form validation
-      echo validation_errors();
 
-      echo form_open('index.php/adminapp/admin_proyecto_investigacion/add'.$this->uri->segment(4).'', $attributes);
+      
+      echo form_open_multipart('index.php/'.$this->uri->segment(1).'/'.$this->uri->segment(2).'/update/'.$this->uri->segment(4), $attributes);
       ?>
         <fieldset>
-          <div class="control-group">
-            <label for="inputError" class="control-label">Nombre</label>
-            <div class="controls">
-              <input type="text" id="nombre" name="nombre_pro" value="<?php echo $product[0]['nombre_pro']; ?>" 
-              style="margin: 0px; width: 512px; height: 20px;">
-              <!--<span class="help-inline">Woohoo!</span>-->
+          <div class="form-group">
+            <label for="nombre_pro" class="col-lg-2 control-label">Descarga de Formatos:</label>
+           <div class="col-lg-8">
+              <div class="span3">
+                <a href="<?php echo base_url(); ?>assets/downloads/formatos/f1.pdf" target="_blank" class="btn btn-default"> 
+                  <span class="glyphicon glyphicon-random"></span> Formato 1 </a>
+                <a href="<?php echo base_url(); ?>assets/downloads/formatos/f2.pdf" class="btn btn-primary"> 
+                  <span class="glyphicon glyphicon-download-alt"></span> Formato 1 </a>
+                <a href="<?php echo base_url(); ?>assets/downloads/formatos/REQUERIMIENTOS.docx" class="btn btn-primary"> 
+                  <span class="glyphicon glyphicon-download-alt"></span> Formato 1 </a>
+              </div>
+              <p class="help-block">Favor descargar los formatos y diligenciarlos puntualmente.<br>
+                                    es de vital importancia el contenido claro y conciso de estos documentos. <br>
+                                    <strong>Adjuntar los archivos correctamente diligenciados.</strong>, [ Obligatorio ].</p>
             </div>
           </div>
-          <div class="control-group">
-            <label for="inputError" class="control-label">Descripcion</label>
-            <div class="controls">
-              <textarea class="input-xlarge" id="descripcion" rows="3" style="margin: 0px; width: 512px; height: 120px;"
-              name="descripcion"><?php echo $product[0]['descripcion']; ?></textarea>
+
+
+          <div class="form-group">
+            <label for="nombre_pro" class="col-lg-2 control-label">Nombre:</label>
+           <div class="col-lg-8">
+              <input class="form-control" type="text" id="nombre_pro" name="nombre_pro" 
+                value="<?php echo $product[0]['nombre_pro']; ?>" 
+               placeholder="Escriba el nombre del Proyecto">
+              <span class="help-inline"><?php echo form_error('nombre_pro'); ?></span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="descripcion" class="col-lg-2 control-label">Descripcion:</label>
+            <div class="col-lg-8">
+              <textarea class="form-control input-xlarge"  id="descripcion" rows="4" 
+              name="descripcion" value=""><?php  echo $product[0]['descripcion']; ?></textarea>
             </div>
           </div> 
-          <div class="control-group">
-            <label for="inputError" class="control-label">Sigla</label>
-            <div class="controls">
-              <input type="text" id="sigla" name="sigla" value="<?php echo $product[0]['sigla']; ?>" 
-              style="margin: 0px; width: 512px; height: 20px;">
-              <!--<span class="help-inline">Woohoo!</span>-->
+          <div class="form-group">
+            <label for="sigla" class="col-lg-2 control-label">Sigla</label>
+            <div class="col-lg-8">
+              <input class="form-control" type="text" id="sigla" name="sigla" 
+              value="<?php  echo $product[0]['sigla']; ?>">
+              <span class="help-inline"><?php echo form_error('sigla'); ?></span>
             </div>
           </div>
-          <div class="control-group">
-            <label for="inputError" class="control-label">Objetivo</label>
-            <div class="controls">
-              <textarea class="input-xlarge" id="objetivo" rows="3" style="margin: 0px; width: 512px; height: 120px;"
-              name="objetivo"><?php echo $product[0]['objetivo']; ?></textarea>
+         <div class="form-group">
+            <label for="objetivo" class="col-lg-2 control-label">Objetivo:</label>
+            <div class="col-lg-8">
+              <textarea class="form-control input-xlarge"  id="objetivo" rows="4" 
+              name="objetivo" value=""><?php echo $product[0]['objetivo']; ?></textarea>
+              <span class="help-inline"><?php echo form_error('objetivo'); ?></span>
             </div>
           </div>
-          <div class="control-group">
-            <label for="inputError" class="control-label">Fecha Caduca</label>
-            <div class="controls">
-              <input type="datetime" id="fecha_caduca" style="margin: 0px; width: 512px; height: 20px;"
-              name="fecha_caduca" value="<?php echo $product[0]['fecha_caducado']; ?>">
+            <div class="form-group">
+            <label for="upload_file" class="col-lg-2 control-label">Adjuntar Archivo:</label>
+            <div class="col-lg-8">
+             <input type="file" class="form-control"  name= "upload_file"
+             value="<?php echo set_value('upload_file'); ?>">
+              <span class="help-inline"><?php echo form_error('upload_file'); ?></span>
             </div>
           </div>
-          <div class="control-group">
-            <label for="inputError" class="control-label">Linea Investigación</label>
-            <div class="controls">
-              <select name="linea_investigacion" style="margin: 0px; width: 300px; height: 25px;"> 
-                <?php
-                  foreach ($linea as $lin) {
-                    echo '<option value="'.$lin['id'].'">'.$lin['tema'].'</option>';
-                  }
-                  foreach ($lineas as $key) {
-                    if($key['id']!=$lin['id']){
-                    echo '<option value="'.$key['id'].'">'.$key['tema'].'</option>';
-                    }
-                  }
-                  ?>
-               
-              </select>
-            </div>
-          </div>
-          <div class="control-group">
-            <label for="inputError" class="control-label">Grupo</label>
-            <div class="controls">
-              <select name="grupo" style="margin: 0px; width: 300px; height: 25px;"
-              value="<?php echo $product[0]['linea_investigacion_id']; ?>"> 
-              <?php
-                  foreach ($grupo as $grup) {
-                    echo '<option value="'.$grup['id'].'">'.$grup['nombre_grupo'].'</option>';
-                  }
-                  foreach ($grupos as $grups) {
-                    if($grups['id']!=$grup['id']){
-                    echo '<option value="'.$grups['id'].'">'.$grups['nombre_grupo'].'</option>';
-                    }
-                  }
-                  ?>
-              </select>
-            </div>
-          </div>  
-          </div>
-          <div class="form-actions">
+          <div class="form-group">
+            <div class="col-lg-offset-2 col-lg-8">
             <button class="btn btn-primary" type="submit">Guardar</button>
             <button class="btn" type="reset">Cancelar</button>
           </div>
+          </div><?php echo form_close(); ?>
         </fieldset>
-
-      <?php echo form_close(); ?>
 
     </div>
