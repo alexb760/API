@@ -255,47 +255,45 @@ class Admin_Proyecto_investigacion extends CI_Controller
             $this->form_validation->set_rules('descripcion', 'descripcion', 'required');
             $this->form_validation->set_rules('sigla','sigla','required|min_length[2]');
             $this->form_validation->set_rules('objetivo','objetivo','required|min_length[5]');
-            //$this->form_validation->set_rules('upload_file','upload_file','required');
             $this->form_validation->set_error_delimiters('<div class="alert alert-danger"><a class="close danger" data-dismiss="alert">&times</a><strong>', '</strong></div>');
             //if the form has passed through the validation
 
             if ($this->form_validation->run())
-            { 
+            {  
                 $params['dir_user'] = $this->input->post('sigla');
                 $params['file']     = 'upload_file';#nombre del campo type=file.
 
                 $data['flash_message'] = $this->menus->upload_file($params);
 
+                $data_to_store = array(
+                'nombre_pro'    => $this->input->post('nombre_pro'),
+                'descripcion'   => $this->input->post('descripcion'),
+                'sigla'         => $this->input->post('sigla'),
+                'objetivo'      => $this->input->post('objetivo'),
+                'path_documento'=> (is_array($data['flash_message']['info'])? $data['flash_message']['info']['file_name']:null)
+                );
                 if($data['flash_message']['status']){
 
-                $data_to_store = array(
-                        'nombre_pro'    => $this->input->post('nombre_pro'),
-                        'descripcion'   => $this->input->post('descripcion'),
-                        'sigla'         => $this->input->post('sigla'),
-                        'objetivo'      => $this->input->post('objetivo'),
-                        'path_documento'=> $data['flash_message']['info']['file_name']
-                        );
-
-                        $file ='Documento: '.$data['flash_message']['info']['file_name'].'<br>';
-                        $file .='Tipo: '.$data['flash_message']['info']['file_type'].'<br>';
-                        $file .='Peso: '.$data['flash_message']['info']['file_size'].'<br>';
-
+                    $file ='Documento: '.$data['flash_message']['info']['file_name'].'<br>';
+                    $file .='Tipo: '.$data['flash_message']['info']['file_type'].'<br>';
+                    $file .='Peso: '.$data['flash_message']['info']['file_size'].'<br>';
                     $data['flash_message']['info'] = $file; 
-                    //if the insert has returned true then we show the flash message
-                    if($this->proyecto_investigacion_model->update_proyecto($id, $data_to_store)){
-                        $data['flash_message']['status'] = TRUE;
-                        $data['flash_message']['message'] .= ' Proyecto guardado con Éxito'.'<br>';
-                         $this->session->set_flashdata('flash_message', $data['flash_message']); 
-                    }else{
-                        $data['flash_message']['status'] = FALSE;
-                        $this->session->set_flashdata('flash_message', $data['flash_message']);  
-                    }
-                }
-                redirect('index.php/adminapp/admin_proyecto_investigacion/update/'.$id.'');
 
-            }//validation run
-
+            }
+         //if the insert has returned true then we show the flash message
+        if($this->proyecto_investigacion_model->update_proyecto($id, $data_to_store)){
+            $data['flash_message']['status'] = TRUE;
+            $data['flash_message']['message'] .= ' Proyecto Actualizado con Éxito'.'<br>';
+             $this->session->set_flashdata('flash_message', $data['flash_message']); 
+        }else{
+            $data['flash_message']['status'] = FALSE;
+            $this->session->set_flashdata('flash_message', $data['flash_message']);  
         }
+        redirect('index.php/adminapp/admin_proyecto_investigacion/update/'.$id.'');
+
+    }//validation run
+
+    }
 
         //if we are updating, and the data did not pass trough the validation
         //the code below wel reload the current data

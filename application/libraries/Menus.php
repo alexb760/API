@@ -295,23 +295,22 @@ public function upload_file($params){
           //$this->ci->upload->initialize($config);
           if (!$this->ci->upload->do_upload($file_element_name)) {// Validation Errors. FAIL
               $status = FALSE;
-              $message = $this->ci->upload->display_errors('', '');
-              $info = implode(' | ',$this->ci->upload->data());
+              $message = 'Error subiendo archivo'.'<br>';
+              $info = $this->ci->upload->display_errors('', '');
           } else {
-              $data = $this->ci->upload->data();
+              $info = $this->ci->upload->data();
           // casi siempre queremos guardar ese archivo en la base de datos. para eso llamamos el metodo del modelo indicado
           // $insertFile = $this->SOME_MODEL->SAVE_FILE($data, $title);  // Llamada al modelo para guardar
           $insertFile = TRUE;
-                        if ($insertFile) {  // File was added correctly to DB
-                            $status = TRUE;
-                            $message = 'Archivo enviado con Éxito!';
-                            $info = $data;
-                        } else {    // Record wasnt added to DB
-                            unlink($data['full_path']); # Deletes the File
-                            $status = FALSE;
-                            $message = 'Algo va Mal!!...';
-                            $info = '';
-                        }
+            if ($insertFile) {  // File was added correctly to DB
+                $status = TRUE;
+                $message = 'Archivo Adjuntado con Éxito!'.'<br>';
+            } else {    // Record wasnt added to DB
+                unlink($data['full_path']); # Deletes the File
+                $status = FALSE;
+                $message = 'Algo va Mal!!...';
+                $info = '';
+            }
                     }
       return array('message' => $message, 'status' => $status, 'info' => $info);
     } catch (Exception $e){

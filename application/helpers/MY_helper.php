@@ -26,16 +26,16 @@ function mensaje_response($p_error, $target ){
             $respons .= '</div>';          
           }
     }else{
-      if ($p_error['status'] = TRUE) {
+      if ($p_error['status'] == TRUE) {
           $respons = '<div class="alert alert-success">';
           $respons .= '<a class="close" data-dismiss="alert">&times;</a>';
           $respons .= '<strong>En hora buena! </strong>'.$p_error['message'];
           $respons .= (isset($p_error['info'])? '<pre>'.$p_error['info'] .'</pre>': '');
           $respons .= '</div>';
       }else{
-        $respons = '<div class="alert alert-warning">';
+          $respons = '<div class="alert alert-danger">';
           $respons .= '<a class="close" data-dismiss="alert">&times;</a>';
-          $respons .= '<strong>Ops! </strong>'.$p_error['message'].'<br>'.'no hay de que preocuparse todo ha sigo guardado.';
+          $respons .= '<strong>Ops! </strong>'.$p_error['message'].'<br>';
           $respons .= (isset($p_error['info'])? '<pre>'.$p_error['info'] .'</pre>': '');
           $respons .= '</div>';
       }
