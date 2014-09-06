@@ -14,7 +14,7 @@
 | path to your installation.
 |
 */
-$config['base_url']	= 'http://localhost/api/';
+$config['base_url']	= 'http://localhost:9090/app/';
 
 /*
 |--------------------------------------------------------------------------
@@ -245,7 +245,7 @@ $config['encryption_key'] = 'hello_world';
 |
 */
 $config['sess_cookie_name']		= 'ci_cookie';
-$config['sess_expiration']		= 512;
+$config['sess_expiration']		= 100000;
 $config['sess_expire_on_close']	= TRUE;
 $config['sess_encrypt_cookie']	= FALSE;
 $config['sess_use_database']	= TRUE;

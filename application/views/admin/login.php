@@ -1,7 +1,7 @@
 <!DOCTYPE html> 
 <html lang="en-US">
   <head>
-    <title>CodeIgniter Admin Sample Project</title>
+    <title>API.</title>
     <meta charset="utf-8">
     <link href="<?php echo base_url(); ?>assets/css/admin/global.css" rel="stylesheet" type="text/css">
   </head>
@@ -19,8 +19,9 @@
             echo '<strong>Oops!</strong> Usuario o Contraseña Invalidos. Intente nuevamente';
           echo '</div>';             
       }
+      echo form_error();
       echo "<br />";
-      echo anchor('admin/signup', 'Signup!');
+      echo anchor('admin/signup', 'Recuperar Contraseña!');
       echo "<br />";
       echo "<br />";
       echo form_submit('submit', 'Login', 'class="btn btn-large btn-primary"');

@@ -48,7 +48,7 @@
                   <span class="glyphicon glyphicon-random"></span> Formato 1 </a>
                 <a href="<?php echo base_url(); ?>assets/downloads/formatos/f2.pdf" class="btn btn-primary"> 
                   <span class="glyphicon glyphicon-download-alt"></span> Formato 1 </a>
-                <a href="<?php echo base_url(); ?>assets/downloads/formatos/REQUERIMIENTOS.docx" class="btn btn-primary"> 
+                <a href="<?php echo base_url(); ?>assets/downloads/formatos/Formato-1.docx" class="btn btn-primary"> 
                   <span class="glyphicon glyphicon-download-alt"></span> Formato 1 </a>
               </div>
               <p class="help-block">Favor descargar los formatos y diligenciarlos puntualmente.<br>

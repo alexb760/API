@@ -135,6 +135,7 @@ class Admin_Actividad_Realizada extends CI_Controller
         $data['ActividadesR'] = round($ActividadR / $Actividades * 100, 2); 
         $data['realizadas'] = $ActividadR;
         $data['activas'] = $Actividades;
+        $data['menu']= $this->menus->menu_usuario($this->session->userdata('user_rol_id'));
 
         $this->pagination->initialize($config);   
         //load the view
@@ -225,6 +226,7 @@ class Admin_Actividad_Realizada extends CI_Controller
          
         $data['manufactures'] = null; 
         $data['main_content'] = 'admin/actividad_realizada/add';
+        $data['menu']= $this->menus->menu_usuario($this->session->userdata('user_rol_id'));
         $this->load->view('includes/template', $data);  
     }
 
@@ -308,6 +310,7 @@ class Admin_Actividad_Realizada extends CI_Controller
                 $data['url'] = 'index.php/adminapp/admin_actividad_realizada/update/?ael='.$_GET['ael'];
             }
             $data['main_content'] = 'admin/actividad_realizada/edit';
+            $data['menu']= $this->menus->menu_usuario($this->session->userdata('user_rol_id'));
             $this->load->view('includes/template', $data);
     }
 
