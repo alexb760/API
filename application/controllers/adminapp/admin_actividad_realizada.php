@@ -3,6 +3,10 @@
 class Admin_Actividad_Realizada extends CI_Controller
 {
 
+    var $permiso;
+    var $per_controlador;
+    var $id_menu;
+
   function __construct()
     {
 		parent::__construct();
@@ -18,8 +22,33 @@ class Admin_Actividad_Realizada extends CI_Controller
 		}
 	}
 
+    private function instancia($key){
+        $instancia  = array();
+        $instancia['user_rol']      = $this->session->userdata('user_rol') ;
+        $instancia['user_rol_id']   = $this->session->userdata('user_rol_id');
+        $instancia['id_user']       = $this->session->userdata('id_user');    
+        $instancia['controlador']   = $this->router->fetch_class();
+        if (!is_null($key)) {
+            $instancia[$key['1']] =  $this->router->fetch_method();
+        }
+        return  $instancia ;
+    }
+
     public function index()
     {
+        $this->per_controlador = $this->menus->get_permisos_controlador($this->instancia(null));
+        $data;
+
+        if ($this->per_controlador === null && $this->per_controlador['controlador'] != $this->router->fetch_class()){
+
+            $p_error['header'] = 'Acceso No autorizado';
+            $p_error['message'] = 'Permisos insuficientes para. '.$this->router->fetch_class();
+            $p_error['menu'] = $this->menus->menu_usuario($this->session->userdata('user_rol_id'));
+            $this->menus->errors($p_error);
+
+        }else{
+            $data['permiso'] =  $this->menus->permisos_funciones($this->per_controlador['permiso']);
+
     	$manufacture_id = $this->input->post('manufacture_id');        
         $search_string = $this->input->post('search_string');        
         $order = $this->input->post('order'); 
@@ -40,7 +69,6 @@ class Admin_Actividad_Realizada extends CI_Controller
         $page = $this->uri->segment(4);
 
         $limit_end = ($page * $config['per_page']) - $config['per_page'];
-        //echo $limit_end;
         if ($limit_end < 0){
             $limit_end = 0;
         } 
@@ -49,11 +77,9 @@ class Admin_Actividad_Realizada extends CI_Controller
             $filter_session_data['order_type'] = $order_type;
         }
         else{
-            //we have something stored in the session? 
             if($this->session->userdata('order_type')){
                 $order_type = $this->session->userdata('order_type');    
             }else{
-                //if we have nothing inside session, so it's the default "Asc"
                 $order_type = 'Asc';    
             }
         }
@@ -137,168 +163,206 @@ class Admin_Actividad_Realizada extends CI_Controller
         $data['activas'] = $Actividades;
         $data['menu']= $this->menus->menu_usuario($this->session->userdata('user_rol_id'));
 
-        $this->pagination->initialize($config);   
-        //load the view
+        $this->pagination->initialize($config);
+            $data['menu']= $this->menus->menu_usuario($this->session->userdata('user_rol_id'));
+            $data['submenu'] = $this->menus->render_submenu();
+            $data['id_menu'] =  $this->id_menu;    
+
         $data['main_content'] = 'admin/actividad_realizada/list';
         $this->load->view('includes/template', $data); 
     }
+    }
 
     public function add()
-    { 
-        $idSub = null;
-        $var = null;
-        $actividad = null;
+    {
+        try{
+            $var = null;
+            $tmp['1'] = 'funcion';
+            if ($this->menus->permiso_funcion($this->instancia($tmp))){
+                $idSub = null;
+                $actividad = null;
 
-        if ($this->input->server('REQUEST_METHOD') === 'POST')
-        {
-            $this->form_validation->set_rules('grupo','grupo','required');
-            $this->form_validation->set_rules('actividad', 'actividad', 'required');
-            $this->form_validation->set_rules('fecha_fin','fecha fin','callback_FechaActividad');
-
-            if($this->input->post('observacion') !== NULL){
-                $this->form_validation->set_rules('observacion','observacion','required');
-            } 
-
-            $this->form_validation->set_error_delimiters('<div class="alert alert-danger"><a class="close" data-dismiss="alert">&times;</a><strong>', '</strong></div>');
-
-                $actividad = $this->input->post('actividad');
-                $idGrupo = $this->input->post('grupo');
-
-                if ($this->form_validation->run())
+                if ($this->input->server('REQUEST_METHOD') === 'POST')
                 {
-                    $data['responsable'] = $this->integrante_model->get_by_id_actividad($actividad);
-                    $IdResponsable = $data['responsable'][0]['Integrante'];
+                    $this->form_validation->set_rules('grupo','grupo','required');
+                    $this->form_validation->set_rules('actividad', 'actividad', 'required');
+                    $this->form_validation->set_rules('fecha_fin','fecha fin','callback_FechaActividad');
 
-                    $data_to_store = array(
-                        'fecha_fin' => $this->input->post('fecha_fin'),
-                        'observacion' => $this->input->post('observacion'),
-                        'responsable' => $IdResponsable,
-                        'ejecutada' => 0,
-                        'actividad_id' => $actividad,
-                    );
+                    if($this->input->post('observacion') !== NULL){
+                        $this->form_validation->set_rules('observacion','observacion','required');
+                    } 
+
+                    $this->form_validation->set_error_delimiters('<div class="alert alert-danger"><a class="close" data-dismiss="alert">&times;</a><strong>', '</strong></div>');
+
+                    $actividad = $this->input->post('actividad');
                     $idGrupo = $this->input->post('grupo');
-                    $idSub = 0;
-                    if($this->sub_actividad_model->subActividadRealizadas($data_to_store['actividad_id'], $idGrupo) == 0){
-                        $idSub = $this->actividad_realizada_model->add($data_to_store);
-                        if($idSub > 0){
-                            //ACTUALIZAR ACTIVIDAD EN REALIZADA
 
-                            $this->session->set_flashdata('flash_message', 'add');
+                    if ($this->form_validation->run())
+                    {
+                        $data['responsable'] = $this->integrante_model->get_by_id_actividad($actividad);
+                        $IdResponsable = $data['responsable'][0]['Integrante'];
+
+                        $data_to_store = array(
+                            'fecha_fin' => $this->input->post('fecha_fin'),
+                            'observacion' => $this->input->post('observacion'),
+                            'responsable' => $IdResponsable,
+                            'ejecutada' => 0,
+                            'actividad_id' => $actividad,
+                        );
+
+                        $idGrupo = $this->input->post('grupo');
+                        $idSub = 0;
+                        
+                        if($this->sub_actividad_model->subActividadRealizadas($data_to_store['actividad_id'], $idGrupo) == 0){
+                            $idSub = $this->actividad_realizada_model->add($data_to_store);
+                            if($idSub > 0){
+                                $this->actividad_model->updateEstado($actividad);
+                                $this->session->set_flashdata('flash_message', 'add');
+                            }else{
+                                $this->session->set_flashdata('flash_message', 'not_add');
+                            } 
                         }else{
-                            $this->session->set_flashdata('flash_message', 'not_add');
-                        } 
-                    }else{
-                        $this->session->set_flashdata('flash_message', 'not_sub'); 
-                    }
+                            $this->session->set_flashdata('flash_message', 'not_sub'); 
+                        }
 
-                    if($idSub > 0){
-                        redirect('index.php/adminapp/admin_actividad_realizada/add/?ael='.base64_encode($idGrupo));
+                        if($idSub > 0){
+                            $this->session->set_flashdata('idActividad',$idSub);
+                            redirect('index.php/adminapp/admin_actividad_realizada/add');
+                        }else{
+                            redirect('index.php/adminapp/admin_actividad_realizada/add');
+                        }
                     }else{
-                        redirect('index.php/adminapp/admin_actividad_realizada/add');
+                        $var = $idGrupo;
+                        $data['actividadV'] = $actividad;
+                        $data['grupoV'] = $idGrupo;
                     }
-                }else{
-                    $var = $idGrupo;
-                    $data['actividadV'] = $actividad;
-                    $data['grupoV'] = $idGrupo;
                 }
-        }
-        $idAR = $this->menu(FALSE);
-        $userLogin = $this->session->userdata('user_name');
+                    $userLogin = $this->session->userdata('user_name');
+                    $id = $this->session->flashdata('idActividad');
 
-        if($idAR !== NULL){
-            $data['product'] = $this->actividad_realizada_model->get_ByID_Edit($idAR);
-            $data['actividadV'] = NULL;
-            $data['grupoV'] = NULL;
-        }else{
-            $data['product'] = NULL;
-            $data['actividad'] = NULL;
+                    if($id != NULL){
+                        $data['product'] = $this->actividad_realizada_model->get_ByID_Edit($id);
+                        $data['actividadV'] = NULL;
+                        $data['grupoV'] = NULL;
+                    }else{
+                        $data['product'] = NULL;
+                        $data['actividad'] = NULL;
 
-            if($var !== NULL){
-                $data['actividad'] = $this->actividad_realizada_model->get_ActividadSinRealizar($var);
+                        if($var !== NULL){
+                            $data['actividad'] = $this->actividad_realizada_model->get_ActividadSinRealizar($var);
+                        }else{
+                            $data['product'] = NULL;
+                            $data['actividad'] = NULL;
+                            $data['actividadV'] = NULL;
+                            $data['grupoV'] = NULL;
+                        }   
+                    }
+                    $data['idactividad'] = $id;
+                    $data['grupo'] = $this->grupo_model->getxUsuario($userLogin);
+
+                    $data['menu']= $this->menus->menu_usuario($this->session->userdata('user_rol_id'));
+                    $data['op_submenu'] = $this->menus->render_submenu();
+                    $data['id_menu'] = $this->id_menu;
+                    $data['options_rol'] = $this->usuario_model->get_rol_option(
+                                                                $this->session->userdata('user_rol_id'),
+                                                                $this->session->userdata('user_rol'));
+                    $data['controlador'] = $this->router->fetch_method();
+         
+                    $data['manufactures'] = null; 
+                    $data['main_content'] = 'admin/actividad_realizada/add';
+                    $this->load->view('includes/template', $data); 
             }else{
-                $data['product'] = NULL;
-                $data['actividad'] = NULL;
-                $data['actividadV'] = NULL;
-                $data['grupoV'] = NULL;
-            }
+                $p_error['header'] = 'Acceso No autorizado';
+                $p_error['message'] = 'Permisos insuficientes para. '.$this->router->fetch_class();
+                $p_error['menu'] = $this->menus->menu_usuario($this->session->userdata('user_rol_id'));
+                $this->menus->errors($p_error);   
+            } 
+        }catch(Exception $e){
+            show_error($e->getMessage().'---'.$e->getTraceAsString());
         }
+<<<<<<< HEAD
         $data['grupo'] = $this->grupo_model->getxUsuario($userLogin);
          
         $data['manufactures'] = null; 
         $data['main_content'] = 'admin/actividad_realizada/add';
         $data['menu']= $this->menus->menu_usuario($this->session->userdata('user_rol_id'));
         $this->load->view('includes/template', $data);  
+=======
+>>>>>>> origin/master
     }
 
     public function update()
     {
-        $var = null;
-        $res = null;
+        try{
+            $id = $this->uri->segment(4);
+            $var = null;
+            $res = null;
 
-        if ($this->input->server('REQUEST_METHOD') === 'POST')
-        {
-            $this->form_validation->set_rules('actividad', 'actividad', 'required');
-            $this->form_validation->set_rules('fecha_fin','fecha fin','callback_FechaActividad');
+            if ($this->input->server('REQUEST_METHOD') === 'POST')
+            {
+                $this->form_validation->set_rules('actividad', 'actividad', 'required');
+                $this->form_validation->set_rules('fecha_fin','fecha fin','callback_FechaActividad');
 
-            if($this->input->post('observacion') !== NULL){
-                $this->form_validation->set_rules('observacion','observacion','required');
-            }
+                if($this->input->post('observacion') !== NULL){
+                    $this->form_validation->set_rules('observacion','observacion','required');
+                }
 
-            $this->form_validation->set_rules('responsable', 'responsable', 'required');
+                $this->form_validation->set_rules('responsable', 'responsable', 'required');
 
-            $this->form_validation->set_error_delimiters('<div class="alert alert-danger">
+                $this->form_validation->set_error_delimiters('<div class="alert alert-danger">
                     <a class="close" data-dismiss="alert">&times;</a>
                     <strong>', '</strong></div>');
             
-            if ($this->form_validation->run())
-            {
-                $data_to_store = array(
-                    'fecha_fin' => $this->input->post('fecha_fin'),
-                    'observacion' => $this->input->post('observacion'),
-                    'responsable' => $this->input->post('responsable'),
-                    'actividad_id' => $this->input->post('actividad'),
-                    'ejecutada' => 0
-                );
+                if ($this->form_validation->run())
+                {
+                    $data_to_store = array(
+                        'fecha_fin' => $this->input->post('fecha_fin'),
+                        'observacion' => $this->input->post('observacion'),
+                        'responsable' => $this->input->post('responsable'),
+                        'actividad_id' => $this->input->post('actividad'),
+                        'ejecutada' => 0
+                    );
 
-                $IdResponsable = $_SESSION['IdResponsable'];
-                //$IdResponsable = $this->session->flashdata('responsable');
+                    $IdResponsable = $_SESSION['IdResponsable'];
+                    //$IdResponsable = $this->session->flashdata('responsable');
+                    echo $idIntegrante = $data_to_store['responsable'];
 
-              /*  if($this->actividad_realizada_model->update($id, $data_to_store) == TRUE){
-                    if($this->integrante_model->updateResponsable($IdResponsable, $data_to_store['responsable']) == TRUE){
+                    if($this->actividad_realizada_model->update($id, $data_to_store) == TRUE){
+                        if($this->integrante_model->updateResponsable($IdResponsable, $idIntegrante) == TRUE){
+                           $this->session->set_flashdata('flash_message', 'updated'); 
+                       }else{
+                        $this->session->set_flashdata('flash_message', 'not_updated');
+                       }
                        $this->session->set_flashdata('flash_message', 'updated'); 
-                   }else{
-                    $this->session->set_flashdata('flash_message', 'not_updated');
-                   }
-                   $this->session->set_flashdata('flash_message', 'updated'); 
-                }else{
-                    $this->session->set_flashdata('flash_message', 'not_updated');
-                }*/
+                    }else{
+                        $this->session->set_flashdata('flash_message', 'not_updated');
+                    }
                 
-                redirect('index.php/adminapp/admin_actividad_realizada/update/?ael='.$_GET['ael']);
-            }else{
-                $var = $this->input->post('actividad');
-                $res = $this->input->post('responsable');
-                $data['actividadV'] = $var;
-                $data['responsableV'] = $this->input->post('responsable');
+                    redirect('index.php/adminapp/admin_actividad_realizada/update/'.$id);
+                }else{
+                    $var = $this->input->post('actividad');
+                    $res = $this->input->post('responsable');
+                    $data['actividadV'] = $var;
+                    $data['responsableV'] = $this->input->post('responsable');
+                }
             }
-        }
-            $id = $this->menu(FALSE);
+                //$id = $this->menu(FALSE);
+            if($var === NULL){
+                if($id !== NULL){
+                    $data['product'] = $this->actividad_realizada_model->get_ByID_Edit($id); 
+                    $data['integrantes'] = $this->integrante_model->get_by_id_grupo($data['product'][0]['idGrupo']);
+                    $data['actividades'] = $this->actividad_realizada_model->get_ActividadSinRealizar($data['product'][0]['idGrupo']);
+                    $data['url'] = 'index.php/adminapp/admin_actividad_realizada/update/'.$id;
 
-            if($id !== NULL){
-                $data['product'] = $this->actividad_realizada_model->get_ByID_Edit($id); 
-                $data['integrantes'] = $this->integrante_model->get_by_id_grupo($data['product'][0]['idGrupo']);
-                $data['actividades'] = $this->actividad_realizada_model->get_ActividadSinRealizar($data['product'][0]['idGrupo']);
-                $data['url'] = 'index.php/adminapp/admin_actividad_realizada/update/?ael='.base64_encode($id);
-
-                $_SESSION['IdResponsable'] = $data['product'][0]['IdResponsable'];
-                $_SESSION['IdGrupo'] = $data['product'][0]['idGrupo'];
-                $data['actividadV'] = NULL;
-                $data['responsableV'] = NULL;
+                    $_SESSION['IdResponsable'] = $data['product'][0]['IdResponsable'];
+                    $_SESSION['IdGrupo'] = $data['product'][0]['idGrupo'];
+                    $data['actividadV'] = NULL;
+                    $data['responsableV'] = NULL;
+                }
             }else{
                 if($var !== NULL){
                     $data['product'] = NULL;
                     $idGrupo = $_SESSION['IdGrupo'];
-                    echo 'id'.$idGrupo;
                     $data['actividades'] = $this->actividad_model->get_byId_grupo($idGrupo);
                     $data['integrantes'] = $this->integrante_model->get_by_id_grupo($idGrupo);
                 }else{
@@ -307,18 +371,35 @@ class Admin_Actividad_Realizada extends CI_Controller
                     $data['responsableV'] = NULL;
                 }
                 
-                $data['url'] = 'index.php/adminapp/admin_actividad_realizada/update/?ael='.$_GET['ael'];
+                $data['url'] = 'index.php/adminapp/admin_actividad_realizada/update/'.$id;
             }
+<<<<<<< HEAD
             $data['main_content'] = 'admin/actividad_realizada/edit';
             $data['menu']= $this->menus->menu_usuario($this->session->userdata('user_rol_id'));
             $this->load->view('includes/template', $data);
     }
+=======
+                $data['menu']= $this->menus->menu_usuario($this->session->userdata('user_rol_id'));
+                $data['op_submenu'] = $this->menus->render_submenu();
+                $data['options_rol'] = $this->usuario_model->get_rol_option(
+                                                                $this->session->userdata('user_rol_id'),
+                                                                $this->session->userdata('user_rol'));
+                $data['main_content'] = 'admin/actividad_realizada/edit';
+                $this->load->view('includes/template', $data);
+
+            }catch(Exception $e){
+                show_error($e->getMessage().'---'.$e->getTraceAsString());
+            }
+        }
+>>>>>>> origin/master
 
     public function delete()
     {
         $id = $this->uri->segment(4);
-        $this->products_model->delete_product($id);
-        redirect('admin/products');
+        $this->actividad_realizada_model->delete($id);
+        
+        $this->session->set_flashdata('flash_message', 'delete');
+        redirect('index.php/adminapp/admin_actividad_realizada');
     }
 
 

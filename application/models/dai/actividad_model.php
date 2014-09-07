@@ -158,6 +158,21 @@ class Actividad_Model extends CI_model
 		}
 	}
 
+	public function updateEstado($id){
+		$this->db->where('id', $id);
+		$this->db->update($this->tbl_Actividad, 'realizada', 0);
+
+		$report = array();
+		$report['error'] = $this->db->_error_number();
+		$report['message'] = $this->db->_error_message();
+
+		if($report !== 0){
+			return true;
+		}else{
+			return $report;
+		}
+	}
+
 	public function delete($id){
 		$this->db->where('id', $id);
 		$this->db->delete($this->tbl_Actividad); 

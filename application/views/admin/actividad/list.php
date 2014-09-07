@@ -70,8 +70,10 @@ function showPrueba(){
             echo form_dropdown('order_type', $options_order_type, $order_type_selected, 'class="span1"');
             echo form_submit($data_submit);
             echo form_close();
-
-            if($this->session->flashdata('flash_message'))
+        ?>
+      </div>
+      <?php
+      if($this->session->flashdata('flash_message'))
             {
               if($this->session->flashdata('flash_message') == 'delete')
               {
@@ -88,8 +90,7 @@ function showPrueba(){
                       </script>';      
               }
             }
-        ?>
-      </div>
+      ?>
       
       <div class="modal fade modal-two" id="modalConfirm">
         <div class="modal-dialog modal-sm">
