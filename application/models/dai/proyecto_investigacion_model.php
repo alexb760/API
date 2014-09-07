@@ -222,7 +222,58 @@ class Proyecto_investigacion_model extends CI_Model
 		$this->db->delete($this->tb_name); 
 	}
 
+function show_info_pro( $limit_start, $limit_end){
+		
+			$campo = array(
+				'proyecto_investigacion.id',
+				'proyecto_investigacion.nombre_pro AS Proyecto',
+				'proyecto_investigacion.descripcion AS Detalle',
+				'proyecto_investigacion.sigla AS Sigla',
+				'proyecto_investigacion.objetivo AS Objetivo',
+				'proyecto_investigacion.fecha_creacion',
+				'proyecto_investigacion.fecha_caducado',
+				'CONCAT(proyecto_investigacion.sigla , "/",proyecto_investigacion.path_documento) AS Documento',
+				'grupo.nombre_grupo'
+				);
+			$this->db->select($campo);
+			$this->db->from($this->tb_name);
+			$this->db->join('grupo','proyecto_investigacion.grupo_id = grupo.id','inner');
+			$this->db->join('integrante','grupo.id = integrante.grupo_id','inner');
 
+		$this->db->limit( $limit_end, $limit_start);
+		$query = $this->db->get();
+		return $query->result_array();
+	}
+
+	public function _count_all(){
+
+			$campo = array(
+				'proyecto_investigacion.id',
+				'proyecto_investigacion.nombre_pro AS Proyecto',
+				'proyecto_investigacion.descripcion AS Detalle',
+				'proyecto_investigacion.sigla AS Sigla',
+				'proyecto_investigacion.objetivo AS Objetivo',
+				'proyecto_investigacion.fecha_creacion',
+				'proyecto_investigacion.fecha_caducado',
+				'CONCAT(proyecto_investigacion.sigla , "/",proyecto_investigacion.path_documento) AS Documento',
+				'grupo.nombre_grupo'
+				);
+			$this->db->select($campo);
+			$this->db->from($this->tb_name);
+			$this->db->join('grupo','proyecto_investigacion.grupo_id = grupo.id','inner');
+			$this->db->join('integrante','grupo.id = integrante.grupo_id','inner');
+
+		$query = $this->db->get();
+
+		$row = $query->num_rows();
+
+		$limit_start = rand(0, $row);
+
+		if(($row - $limit_start) < 3){
+			$limit_start = $limit_start - (3 - ($row - $limit_start));
+		}
+		return $limit_start;
+	}
 
 }
 

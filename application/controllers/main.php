@@ -9,6 +9,9 @@ class Main extends CI_Controller
 	{
 		parent::__construct();
 		$this->load->model('dai/usuario_model');
+		$this->load->model('dai/grupo_model');
+		$this->load->model('dai/proyecto_investigacion_model');
+		$this->load->model('dai/producto_model');
 	}
 
 
@@ -81,6 +84,10 @@ class Main extends CI_Controller
 				$this->session->set_userdata($data);
 				
 				$datos['main_content'] = 'admin/main';
+				$datos['social'] = $this->grupo_model->show_info_grupo($this->grupo_model->_count_all(),3);
+				$datos['proyect_info'] = $this->proyecto_investigacion_model->show_info_pro( $this->proyecto_investigacion_model->_count_all(),3);
+				$datos['productos_grupo'] = $this->producto_model->show_info_producto($this->producto_model->_count_all(),2);
+				$datos['productos_grupo'] = $this->producto_model->show_info_producto($this->producto_model->_count_all(),2);
 				$datos['session'] = $data;
 				//redirect('index.php/adminapp/admin_linea_investigacion');
 				$this->load->view('includes/template', $datos); 
@@ -112,7 +119,11 @@ class Main extends CI_Controller
 	}
 
 	function principal(){
+		
 		$datos['menu'] =  $this->menus->menu_usuario($this->session->userdata('user_rol_id'));
+		$datos['social'] = $this->grupo_model->show_info_grupo($this->grupo_model->_count_all(),3);
+		$datos['proyect_info'] = $this->proyecto_investigacion_model->show_info_pro( $this->proyecto_investigacion_model->_count_all(),3);
+		$datos['productos_grupo'] = $this->producto_model->show_info_producto($this->producto_model->_count_all(),2);
 		$datos['main_content'] = 'admin/main';
 			//redirect('index.php/adminapp/admin_linea_investigacion');
 		$this->load->view('includes/template', $datos); 

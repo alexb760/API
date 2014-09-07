@@ -238,5 +238,69 @@ function get_all_(){
 		$this->db->delete('grupo'); 
 	}
 
+	 public function show_info_grupo($start, $end){ 
+		$campo = array(
+				'grupo.nombre_grupo AS Nombre',
+				'grupo.sigla As Sigla',
+				'grupo.avalado_col AS Avalado_Colciencia',
+				'grupo.clasificacion AS Clasificacion',
+				'CONCAT("<a target=_blank href='.prep_url(auto_link('",grupo.pagina_web,"'.'>",grupo.pagina_web,"</a>"').') AS Web'),
+				'grupo.correo AS Correo',
+				'grupo.fecha_creacion AS Fecha_Creado',
+				'CONCAT("<a target=_blank href='.prep_url(auto_link('",grupo.path_colciencias,"'.'>",grupo.path_colciencias,"</a>"').') AS Colciencias'),
+				'estado.descripcion AS Estado',
+				'estado.observacion AS Observacion',
+				'linea_investigacion.linea'
+				);
+		$this->db->select($campo);
+		$this->db->from('grupo');
+		$this->db->join('estado','estado.id = grupo.estado_id or  grupo.estado_id = null','inner');
+		$this->db->join('integrante','integrante.grupo_id = grupo.id','inner');
+		$this->db->join('lineas_grupo','grupo.id = lineas_grupo.grupo_id','inner');
+		$this->db->join('linea_investigacion','lineas_grupo.linea_investigacion_id = linea_investigacion.id','inner');
+##establece el numero de columnas para parametrizar de forma aleatoria el limit
+		
+		
+		$this->db->limit(  $end, $start );
+
+		$query = $this->db->get();
+		
+		return $query->result_array();  
+	}
+
+	public function _count_all(){
+
+		$campo = array(
+				'grupo.nombre_grupo AS Nombre',
+				'grupo.sigla As Sigla',
+				'grupo.avalado_col AS Avalado_Colciencia',
+				'grupo.clasificacion AS Clasificacion',
+				'CONCAT("<a target=_blank href='.prep_url(auto_link('",grupo.pagina_web,"'.'>",grupo.pagina_web,"</a>"').') AS Web'),
+				'grupo.correo AS Correo',
+				'grupo.fecha_creacion AS Fecha_Creado',
+				'CONCAT("<a target=_blank href='.prep_url(auto_link('",grupo.path_colciencias,"'.'>",grupo.path_colciencias,"</a>"').') AS Colciencias'),
+				'estado.descripcion AS Estado',
+				'estado.observacion AS Observacion',
+				'linea_investigacion.linea'
+				);
+		$this->db->select($campo);
+		$this->db->from('grupo');
+		$this->db->join('estado','estado.id = grupo.estado_id or  grupo.estado_id = null','inner');
+		$this->db->join('integrante','integrante.grupo_id = grupo.id','inner');
+		$this->db->join('lineas_grupo','grupo.id = lineas_grupo.grupo_id','inner');
+		$this->db->join('linea_investigacion','lineas_grupo.linea_investigacion_id = linea_investigacion.id','inner');
+
+		$query = $this->db->get();
+
+		$row = $query->num_rows();
+
+		$limit_start = rand(0, $row);
+
+		if(($row - $limit_start) < 3){
+			$limit_start = $limit_start - (3 - ($row - $limit_start));
+		}
+		return $limit_start;
+	}
+
 }
 ?>

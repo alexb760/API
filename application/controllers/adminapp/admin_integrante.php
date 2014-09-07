@@ -151,7 +151,7 @@ class Admin_Integrante extends CI_Controller
 
         //initializate the panination helper 
         $this->pagination->initialize($config);   
-
+       
         //load the view
         $data['main_content'] = 'admin/integrante/list';
         $this->load->view('includes/template', $data);  
