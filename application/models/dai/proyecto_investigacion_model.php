@@ -271,6 +271,8 @@ function show_info_pro( $limit_start, $limit_end){
 
 		if(($row - $limit_start) < 3){
 			$limit_start = $limit_start - (3 - ($row - $limit_start));
+			if($limit_start < 0)
+				$limit_start = 0;
 		}
 		return $limit_start;
 	}
