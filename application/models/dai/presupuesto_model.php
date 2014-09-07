@@ -3,6 +3,7 @@
 class Presupuesto_Model extends CI_model
 {
 	private $tbl_Presupuesto = 'presupuesto';
+	private $tbl_PresupuestoA = 'presupuesto_actividad';
 	
 	function __construct()
 	{
@@ -17,6 +18,14 @@ class Presupuesto_Model extends CI_model
 		return 0;
 	}
 
+	public function addPresupuestoA($data){
+		if($this->db->insert($this->tbl_PresupuestoA, $data)){
+			return $this->db->insert_id();
+		}else{
+			return 0;
+		}
+	}
+
 	function get_all_(){
 		$this->db->select('*');
 		$this->db->from($this->tbl_Presupuesto);
@@ -26,23 +35,19 @@ class Presupuesto_Model extends CI_model
 
 	function get_all($search_string=null, $order=null, $order_type='Asc', $limit_start, $limit_end){
 		$campos = array (
-			'presupuesto.id as IdPresupuesto',
-			'presupuesto.fecha_inicio as FechaInicio',
-			'presupuesto.fecha_final as FechaFinal',
+			'presupuesto.id as id',
 			'presupuesto.valor as Valor',
-			'presupuesto.autoriza as Autoriza',
-			'presupuesto.grupo_id as IdGrupo',
-			'presupuesto_actividad.valor_gasto as ValorGasto',
-			'actividad.descripcion as Actividad');
+			'concat_ws(" ",usuario.nombre,usuario.apellido) as Autoriza',
+			'grupo.nombre_grupo as "Nombre Grupo"',
+			'presupuesto_actividad.valor_gasto as "Valor Gasto"',
+			'actividad.descripcion as Actividad'
+			);
 		$this->db->select($campos);
 		$this->db->from($this->tbl_Presupuesto);
-		$this->db->join('presupuesto_actividad','presupuesto.id = presupuesto_actividad.presupuesto_id','inner');
-		$this->db->join('actividad','presupuesto_actividad.actividad_id = actividad.id','inner');
-		//$this->db->join('presupuesto','presupuesto_actividad.presupuesto_id = presupuesto.id','left');
-		//$this->db->join('responsable','actividad.id = responsable.actividad_id','inner');
-		//$this->db->join('integrante','responsable.integrante_id = integrante.id','inner');
-		//$this->db->join('usuario','integrante.usuario_id = usuario.id','inner');
 		$this->db->join('grupo','presupuesto.grupo_id = grupo.id','inner');
+		$this->db->join('presupuesto_actividad','presupuesto.id = presupuesto_actividad.presupuesto_id','left');
+		$this->db->join('actividad','presupuesto_actividad.actividad_id = actividad.id','left');
+		$this->db->join('usuario','presupuesto.autoriza = usuario.id','inner');
 
 		$query = $this->db->get();
 		$datos =  array('sql' => $this->db->last_query(),

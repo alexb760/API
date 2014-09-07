@@ -161,7 +161,6 @@ class Admin_Actividad_Realizada extends CI_Controller
         $data['ActividadesR'] = round($ActividadR / $Actividades * 100, 2); 
         $data['realizadas'] = $ActividadR;
         $data['activas'] = $Actividades;
-        $data['menu']= $this->menus->menu_usuario($this->session->userdata('user_rol_id'));
 
         $this->pagination->initialize($config);
             $data['menu']= $this->menus->menu_usuario($this->session->userdata('user_rol_id'));
@@ -377,9 +376,10 @@ class Admin_Actividad_Realizada extends CI_Controller
             $data['menu']= $this->menus->menu_usuario($this->session->userdata('user_rol_id'));
             $this->load->view('includes/template', $data);
 
-            $data['menu']= $this->menus->menu_usuario($this->session->userdata('user_rol_id'));
-            $data['op_submenu'] = $this->menus->render_submenu();
-            $data['options_rol'] = $this->usuario_model->get_rol_option(
+                $data['menu']= $this->menus->menu_usuario($this->session->userdata('user_rol_id'));
+                $data['op_submenu'] = $this->menus->render_submenu();
+                $data['options_rol'] = $this->usuario_model->get_rol_option(
+
                                                                 $this->session->userdata('user_rol_id'),
                                                                 $this->session->userdata('user_rol'));
                 $data['main_content'] = 'admin/actividad_realizada/edit';
@@ -388,7 +388,10 @@ class Admin_Actividad_Realizada extends CI_Controller
             }catch(Exception $e){
                 show_error($e->getMessage().'---'.$e->getTraceAsString());
             }
-    }
+
+
+        }
+
 
     public function delete()
     {
