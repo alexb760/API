@@ -161,7 +161,6 @@ class Admin_Actividad_Realizada extends CI_Controller
         $data['ActividadesR'] = round($ActividadR / $Actividades * 100, 2); 
         $data['realizadas'] = $ActividadR;
         $data['activas'] = $Actividades;
-        $data['menu']= $this->menus->menu_usuario($this->session->userdata('user_rol_id'));
 
         $this->pagination->initialize($config);
             $data['menu']= $this->menus->menu_usuario($this->session->userdata('user_rol_id'));
@@ -280,15 +279,6 @@ class Admin_Actividad_Realizada extends CI_Controller
         }catch(Exception $e){
             show_error($e->getMessage().'---'.$e->getTraceAsString());
         }
-<<<<<<< HEAD
-        $data['grupo'] = $this->grupo_model->getxUsuario($userLogin);
-         
-        $data['manufactures'] = null; 
-        $data['main_content'] = 'admin/actividad_realizada/add';
-        $data['menu']= $this->menus->menu_usuario($this->session->userdata('user_rol_id'));
-        $this->load->view('includes/template', $data);  
-=======
->>>>>>> origin/master
     }
 
     public function update()
@@ -373,12 +363,6 @@ class Admin_Actividad_Realizada extends CI_Controller
                 
                 $data['url'] = 'index.php/adminapp/admin_actividad_realizada/update/'.$id;
             }
-<<<<<<< HEAD
-            $data['main_content'] = 'admin/actividad_realizada/edit';
-            $data['menu']= $this->menus->menu_usuario($this->session->userdata('user_rol_id'));
-            $this->load->view('includes/template', $data);
-    }
-=======
                 $data['menu']= $this->menus->menu_usuario($this->session->userdata('user_rol_id'));
                 $data['op_submenu'] = $this->menus->render_submenu();
                 $data['options_rol'] = $this->usuario_model->get_rol_option(
@@ -391,7 +375,6 @@ class Admin_Actividad_Realizada extends CI_Controller
                 show_error($e->getMessage().'---'.$e->getTraceAsString());
             }
         }
->>>>>>> origin/master
 
     public function delete()
     {
