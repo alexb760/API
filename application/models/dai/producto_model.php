@@ -59,6 +59,8 @@ class Producto_model extends CI_model
 
 		if(($row - $limit_start) < 2){
 			$limit_start = $limit_start - (2 - ($row - $limit_start));
+			if($limit_start < 0)
+				$limit_start = 0;
 		}
 		return $limit_start;
 	}
