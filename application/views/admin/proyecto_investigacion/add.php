@@ -44,12 +44,10 @@
             <label for="nombre_pro" class="col-lg-2 control-label">Descarga de Formatos:</label>
            <div class="col-lg-8">
               <div class="span3">
-                <a href="<?php echo base_url(); ?>assets/downloads/formatos/f1.pdf" target="_blank" class="btn btn-default"> 
-                  <span class="glyphicon glyphicon-random"></span> Formato 1 </a>
-                <a href="<?php echo base_url(); ?>assets/downloads/formatos/f2.pdf" class="btn btn-primary"> 
-                  <span class="glyphicon glyphicon-download-alt"></span> Formato 1 </a>
-                <a href="<?php echo base_url(); ?>assets/downloads/formatos/Formato-1.docx" class="btn btn-primary"> 
-                  <span class="glyphicon glyphicon-download-alt"></span> Formato 1 </a>
+                <a href="<?php echo base_url(); ?>assets/downloads/formatos/INV-P-1 Organizacion de la Investigacion - Formatos_V2.xls" target="_blank" class="btn btn-default"> 
+                  <span class="glyphicon glyphicon-random"></span> Organización de la Investigación </a>
+                <a href="<?php echo base_url(); ?>assets/downloads/formatos/INV-P-2 Gestion de Proyectos de Inv - Formatos_V2.xls" class="btn btn-primary"> 
+                  <span class="glyphicon glyphicon-download-alt"></span> Gestión de Proyectos </a>
               </div>
               <p class="help-block">Favor descargar los formatos y diligenciarlos puntualmente.<br>
                                     es de vital importancia el contenido claro y conciso de estos documentos. <br>
@@ -109,6 +107,9 @@
              <input type="file" class="form-control"  name= "upload_file"
              value="<?php echo set_value('upload_file'); ?>">
               <span class="help-inline"><?php echo form_error('upload_file'); ?></span>
+              <p class="help-block">Si Va adjuntar más de un documento.<br>
+                                    Favor comprimir en un formato<strong> .zip, .rar, .tar, .tar.gz, 7zip </strong> <br>
+                                    <strong>Adjuntar los archivos correctamente diligenciados.</strong>, [ Obligatorio ].</p>
             </div>
           </div>
 		      <div class="form-group">

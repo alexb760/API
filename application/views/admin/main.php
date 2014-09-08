@@ -45,6 +45,18 @@
       </div>
       </div>
       </div>
+    <div class="col-lg-5">
+      <div class="panel panel-info">
+         <div class="panel-heading">Formatos </div>
+         <div class="panel-body">
+          <button class="btn btn-lg btn-success" data-toggle="modal" data-target="#myModal">
+            Descargar Formatos...
+          </button>
+            
+        </div>
+        </div>
+    </div>
+
       <div class="col-lg-5">
       <div class="panel panel-info">
          <div class="panel-heading">Productos Desarrollados</div>
@@ -73,5 +85,47 @@
         </div>
       </div>
       <!-- /END THE FEATURETTES -->
+
+      <!-- Button trigger modal -->
+
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="myModalLabel">Lista de Formatos.</h4>
+      </div>
+        <a href="<?php echo base_url(); ?>assets/downloads/formatos/INV-P-1 Organizacion de la Investigacion - Formatos_V2.xls" target="_blank" class="list-group-item"> 
+        <i class="fa fa-download"></i> Organización de la Investigación <i class="fa fa-file-excel-o"></i> </a>
+        <a href="<?php echo base_url(); ?>assets/downloads/formatos/INV-P-2 Gestion de Proyectos de Inv - Formatos_V2.xls" class="list-group-item"> 
+        <i class="fa fa-download"></i> Gestión de Proyectos <i class="fa fa-file-excel-o"></i></a>
+        <hr class="divider">
+        <a href="<?php echo base_url(); ?>assets/downloads/formatos/INV-F-1.xls" target="_blank" class="list-group-item"> 
+        <i class="fa fa-download"></i> Creación Grupos de Investigación <i class="fa fa-file-excel-o"></i> </a>
+        <a href="<?php echo base_url(); ?>assets/downloads/formatos/INV-F-2.xlsx" target="_blank" class="list-group-item"> 
+        <i class="fa fa-download"></i> Registro Linea Investigación <i class="fa fa-file-excel-o"></i> </a>
+        <a href="<?php echo base_url(); ?>assets/downloads/formatos/INV-F-3.xlsx" target="_blank" class="list-group-item"> 
+        <i class="fa fa-download"></i> Creación Semilleros de Investigación <i class="fa fa-file-excel-o"></i></a>
+        <hr class="divider">
+        <a href="<?php echo base_url(); ?>assets/downloads/formatos/INV-F-3.xlsx" target="_blank" class="list-group-item"> 
+        <i class="fa fa-download"></i> Formulario de Presentación de Proyecto <i class="fa fa-file-excel-o"></i></a>
+        <a href="<?php echo base_url(); ?>assets/downloads/formatos/INV-F-5.xlsx" target="_blank" class="list-group-item"> 
+        <i class="fa fa-download"></i> Indicadores de Resultados de Proyecto <i class="fa fa-file-excel-o"></i></a>
+        <a href="<?php echo base_url(); ?>assets/downloads/formatos/INV-F-6.xlsx" target="_blank" class="list-group-item"> 
+        <i class="fa fa-download"></i> Impacto esperado <i class="fa fa-file-excel-o"></i></a>
+        <a href="<?php echo base_url(); ?>assets/downloads/formatos/INV-F-7.xlsx" target="_blank" class="list-group-item"> 
+        <i class="fa fa-download"></i> Tabla Presupuesto <i class="fa fa-file-excel-o"></i></a>
+        <a href="<?php echo base_url(); ?>assets/downloads/formatos/INV-F-8.xlsx" target="_blank" class="list-group-item"> 
+        <i class="fa fa-download"></i> Acta de Propiedad Intelectual <i class="fa fa-file-excel-o"></i></a>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
 
     </div><!-- /.container -->

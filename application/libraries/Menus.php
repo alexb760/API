@@ -288,7 +288,7 @@ public function upload_file($params){
           $config['upload_path'] = './assets/uploads/grupos/'.$dir_user;
           //$config['upload_url'] = base_url()."/assets/uploads/grupos/";
           //$config['upload_path'] = './uploads/grupos/'.$dir_user;
-          $config['allowed_types'] = 'doc|docx|pdf|txt|xsl|xslx|html|odf|rar|zip|7zip';
+          $config['allowed_types'] = 'doc|docx|pdf|txt|xsl|xslx|html|odf|rar|zip|7zip|tar|gz';
           $config['max_size'] = $max_size * 8;
           $config['overwrite'] = TRUE;
           $this->ci->load->library('upload',$config);
