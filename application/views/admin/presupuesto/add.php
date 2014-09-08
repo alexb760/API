@@ -2,8 +2,8 @@
   function inhabilitarCampos(){
       document.getElementById("grupo").disabled = true ;
       document.getElementById("valor").disabled = true;
-      document.getElementById("actividad").disabled = true;
-      document.getElementById("valorActividad").disabled = true;
+      document.getElementById("fecha_inicio").disabled = true;
+      document.getElementById("fecha_fin").disabled = true;
       document.getElementById("btnGuardar").disabled = true;
     }
 </script>
@@ -67,11 +67,30 @@
             <label for="grupo" class="col-lg-2 control-label">Grupo:</label>
             <div class="col-lg-8">
               <select name="grupo" id="grupo" class="form-control" >  
-              <?php 
-              echo '<option value="">Seleccione</option>';
-              foreach ($grupo as $grup) {
-                echo '<option value="'.$grup['idGrupo'].'">'.$grup['nombreG'].'</option>';
-              } 
+              <?php
+                if($product[0]['grupo_id'] != NULL){
+                  foreach ($product as $grup) {
+                    echo '<option value="'.$grup['grupo_id'].'">'.$grup['nombreG'].'</option>';
+                  }
+                }else{
+                  if($grupoV != NULL){
+                    foreach ($grupo as $grup) {
+                      if($grup['idGrupo'] === $grupoV){
+                        echo '<option value="'.$grup['idGrupo'].'">'.$grup['nombreG'].'</option>';
+                      }
+                    }
+                    foreach ($grupo as $grup) {
+                      if($grup['idGrupo'] !== $grupoV){
+                        echo '<option value="'.$grup['idGrupo'].'">'.$grup['nombreG'].'</option>';
+                      }
+                    }
+                  }else{
+                    echo '<option value="0">Seleccione</option>';
+                    foreach ($grupo as $grup) {
+                      echo '<option value="'.$grup['idGrupo'].'">'.$grup['nombreG'].'</option>';
+                    }
+                }
+              }
               ?> 
               </select>
               <span class="help-inline"><?php echo form_error('grupo');?></span>
@@ -83,17 +102,70 @@
             <div class="col-lg-8">
               <input type="number" class="form-control" id="valor" name="valor" min="50" step="50" required
               placeholder="Ingrese valor sin puntos ni comas." pattern="[0-9]*" title="Ingrese valor sin puntos ni comas."
-              value="<?php echo set_value('valor'); ?>">
+              value="<?php 
+                if($product[0]['valor'] != NULL){
+                  echo $product[0]['valor'];
+                }else{
+                  echo set_value('valor');
+                }
+                ?>">
               <span class="help-inline"><?php echo form_error('valor');?></span>
             </div>
           </div>
-          
+
           <div class="form-group">
+        <label for="fecha_inicio" class="col-lg-2 control-label" >Fecha Inicio:</label>
+        <div class="col-lg-8">
+          <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" required 
+            value="<?php 
+            if($product[0]['fecha_inicio'] != NULL){
+              echo $product[0]['fecha_inicio'];
+            }else{
+              echo set_value('fecha_inicio');
+            }
+            ?>" title="Se requiere fecha inicio">
+          <span class="help-inline"><?php echo form_error('fecha_inicio');?></span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="fecha_fin" class="col-lg-2 control-label" >Fecha Fin:</label>
+        <div class="col-lg-8">
+          <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" required
+            value="<?php 
+              if($product[0]['fecha_fin'] != NULL){
+                echo $product[0]['fecha_fin'];
+              }else{
+                echo set_value('fecha_fin');
+              }
+            ?>" title="Se requiere fecha fin">
+              <span id="sp" class="help-inline"><?php echo form_error('fecha_fin');?></span>
+        </div>
+      </div>
+          
+          <!--<div class="form-group">
             <label for="actividad" class="col-lg-2 control-label">Actividad:</label>
             <div class="col-lg-8">
               <select name="actividad" id="actividad" class="form-control" title="Seleccione actividad">  
               <?php 
-              echo '<option value="">Seleccione</option>';
+                if($product[0]['idActividad'] != NULL){
+                  foreach ($product as $prod){
+                    echo '<option value="'.$prod['IdActividad'].'">'.$prod['Actividad'].'</option>';
+                  }
+                }else if($actividadV != NULL){
+                  foreach ($actividad as $acti) {
+                    if($acti['IdActividad'] === $actividadV){
+                      echo '<option value="'.$acti['IdActividad'].'">'.$acti['Actividad'].'</option>';
+                    }
+                  }
+                  foreach ($actividad as $activ) {
+                    if($activ['IdActividad'] !== $actividadV){
+                      echo '<option value="'.$activ['IdIntegrante'].'">'.$activ['Usuario'].'</option>';
+                    }
+                  }
+                }else{
+                  echo '<option value="">Seleccione</option>';
+                }
               ?> 
               </select>
               <span class="help-inline"><?php echo form_error('actividad');?></span>
@@ -108,12 +180,11 @@
               value="<?php echo set_value('valorActividad'); ?>">
               <span class="help-inline"><?php echo form_error('valorActividad');?></span>
             </div>
-          </div>
+          </div>-->
           
-          </div>
           <div class="form-group">
             <div class="col-lg-offset-2 col-lg-8">
-            <button class="btn btn-primary" type="submit">Guardar</button>
+            <button id="btnGuardar" class="btn btn-primary" type="submit">Guardar</button>
             <button class="btn" type="reset">Cancelar</button>
           </div>
         </div>

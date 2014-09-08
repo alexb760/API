@@ -36,11 +36,13 @@ class Presupuesto_Model extends CI_model
 	function get_all($search_string=null, $order=null, $order_type='Asc', $limit_start, $limit_end){
 		$campos = array (
 			'presupuesto.id as id',
-			'presupuesto.valor as Valor',
-			'concat_ws(" ",usuario.nombre,usuario.apellido) as Autoriza',
 			'grupo.nombre_grupo as "Nombre Grupo"',
-			'presupuesto_actividad.valor_gasto as "Valor Gasto"',
-			'actividad.descripcion as Actividad'
+			'presupuesto.valor as Valor',
+			'presupuesto.fechaInicio as "Fecha Inicio"',
+			'presupuesto.fechaFin as "Fecha Fin"',
+			'concat_ws(" ",usuario.nombre,usuario.apellido) as Autoriza',
+			'actividad.descripcion as Actividad',
+			'presupuesto_actividad.valor_gasto as "Gasto Actividad"'
 			);
 		$this->db->select($campos);
 		$this->db->from($this->tbl_Presupuesto);
@@ -52,6 +54,24 @@ class Presupuesto_Model extends CI_model
 		$query = $this->db->get();
 		$datos =  array('sql' => $this->db->last_query(),
 						'datos' => $query->result_array() );
+		return $query->result_array();
+	}
+
+	public function getXid($idPresupuesto){
+		$campos = array(
+			'presupuesto.id as id',
+			'presupuesto.fechaInicio as fecha_inicio',
+			'presupuesto.fechaFin as fecha_fin',
+			'presupuesto.valor as valor',
+			'presupuesto.grupo_id as grupo_id',
+			'grupo.nombre_grupo as nombreG');
+		$this->db->select($campos);
+		$this->db->from($this->tbl_Presupuesto);
+		$this->db->join('grupo', 'presupuesto.grupo_id = grupo.id', 'inner');
+		$this->db->where('presupuesto.id', $idPresupuesto);
+
+		$query = $this->db->get();
+
 		return $query->result_array();
 	}
 
@@ -78,7 +98,7 @@ class Presupuesto_Model extends CI_model
 
     function update($id, $data)
     {
-		$this->db->where('id', $id);
+		$this->db->where('presupuesto.id', $id);
 		$this->db->update($this->tbl_Presupuesto, $data);
 		$report = array();
 		$report['error'] = $this->db->_error_number();
@@ -93,6 +113,17 @@ class Presupuesto_Model extends CI_model
 	function delete($id){
 		$this->db->where('id', $id);
 		$this->db->delete($this->tbl_Presupuesto); 
+	}
+
+	public function calcularValor($idPresupuesto){
+
+		$this->db->select('SUM(valor_gasto) as valor');
+		$this->db->from($this->tbl_PresupuestoA);
+		$this->db->join('presupuesto', 'presupuesto_actividad.presupuesto_id = presupuesto.id', 'inner');
+		$this->db->where('presupuesto.id', $idPresupuesto);
+
+		$query = $this->db->get();
+		return $query->result_array();
 	}
 }
 ?>
