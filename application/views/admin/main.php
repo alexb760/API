@@ -14,7 +14,7 @@
         <?php
           foreach ($social as $key ) {
             echo '<div class="col-lg-4">';
-            echo '<img class="img-circle" src="/app/assets/imagenes/001.jpg" alt="Generic placeholder image" style="width: 140px; height: 140px;">';
+            echo '<img class="img-circle" src="/api/assets/imagenes/001.jpg" alt="Generic placeholder image" style="width: 140px; height: 140px;">';
             echo '<h2>'.$key['Nombre'].'</h2>';
             echo '<p>'.$key['Web'].'</p>';
             echo '<p><a class="btn btn-default" href="#" role="button">Detalles &raquo;</a></p>';

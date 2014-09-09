@@ -54,11 +54,11 @@ class Admin_Presupuesto extends CI_Controller
         $order = $this->input->post('order'); 
         $order_type = $this->input->post('order_type'); 
 
-        $config['per_page'] = 7;
+        $config['per_page'] = 2;
         $config['base_url'] = base_url().'index.php/adminapp/admin_presupuesto/index/';
         $config['use_page_numbers'] = TRUE;
         $config['num_links'] = 20;
-        $config['full_tag_open'] = '<ul>';
+        $config['full_tag_open'] = '<ul class= "pagination">';
         $config['full_tag_close'] = '</ul>';
         $config['num_tag_open'] = '<li>';
         $config['num_tag_close'] = '</li>';
@@ -147,6 +147,13 @@ class Admin_Presupuesto extends CI_Controller
             $config['total_rows'] = $data['count_products'];
         }
 
+        $var = $this->session->flashdata('idPresupuesto');
+                if($var !== ""){
+                    $data['idPresupuesto'] = $var;
+                }else{
+                    $data['idPresupuesto'] = 0;
+                }
+
         $data['menu']= $this->menus->menu_usuario($this->session->userdata('user_rol_id'));
 
         $this->pagination->initialize($config);
@@ -169,58 +176,35 @@ class Admin_Presupuesto extends CI_Controller
             if ($this->menus->permiso_funcion($this->instancia($tmp))){
                 $idGrupo = null;
                 $id = null;
-                //$actividad = null;
 
         if ($this->input->server('REQUEST_METHOD') === 'POST')
         {
             $this->form_validation->set_rules('grupo','grupo','required');
             $this->form_validation->set_rules('valor','valor','required');
             $this->form_validation->set_rules('fecha_inicio','fecha inicio','required');
-            $this->form_validation->set_rules('fecha_fin','fecha fin','callback_fechas');
+            $this->form_validation->set_rules('fecha_final','fecha fin','callback_fechas');
 
-            //$actividad = $this->input->post('actividad');
             $idGrupo = $this->input->post('grupo');
-
-            /*if($actividad !== ""){
-                $this->form_validation->set_rules('actividad','actividad','required');
-                $this->form_validation->set_rules('valorActividad','valor actividad','required');
-                $sw = true;
-            }*/
 
             $this->form_validation->set_error_delimiters('<div class="alert alert-danger"><a class="close" data-dismiss="alert">&times;</a><strong>', '</strong></div>');
                 if ($this->form_validation->run())
                 {
+                    $valor = $this->input->post('valor');
+                    if($valor === "" || $valor === NULL){
+                        $valor = 0;
+                    }
+
                     $data_to_store = array(
                         'fechasistema' => date('Y-m-d H:m:s'),
-                        'fechaInicio' => $this->input->post('fecha_inicio'),
-                        'fechaFin' => $this->input->post('fecha_fin'),
-                        'valor' => $this->input->post('valor'),
+                        'fecha_inicio' => $this->input->post('fecha_inicio'),
+                        'fecha_final' => $this->input->post('fecha_final'),
+                        'valor' => $valor,
                         'autoriza' => $this->session->userdata('id_user'),
                         'grupo_id' => $idGrupo
                     );
 
                     $idPresupuesto = $this->presupuesto_model->add($data_to_store);
-                    //$idPresupuesto = 2;
                     if($idPresupuesto > 0){
-                        /*if($sw){
-                            $data_to_store = array(
-                                'presupuesto_id' => $idPresupuesto,
-                                'actividad_id' => $this->input->post('actividad'),
-                                'valor_gasto' => $this->input->post('valorActividad')
-                            );
-
-                            if($this->presupuesto_model->addPresupuestoA($data_to_store)){
-                                //$data['idPresupuesto'] = $idPresupuesto;
-                                
-                                $this->session->set_flashdata('flash_add', 'add');
-                            }else{
-                                $this->session->set_flashdata('flash_message', 'not_addA');
-                            }
-                        }
-                        else{
-                            $this->session->set_flashdata('flash_message', 'add');
-                            $this->session->set_flashdata('flash_add', 'add');
-                        }*/
                         $data['idPresupuesto'] = $idPresupuesto;
                         $this->session->set_flashdata('idPresupuesto', $data['idPresupuesto']);
                         
@@ -231,7 +215,6 @@ class Admin_Presupuesto extends CI_Controller
                     redirect('index.php/adminapp/admin_presupuesto/add');
                 }else{
                     $var = $idGrupo;
-                    //$data['actividadV'] = $actividad;
                     $data['grupoV'] = $idGrupo;
                 }
         }
@@ -240,18 +223,14 @@ class Admin_Presupuesto extends CI_Controller
             $data['product'] = $this->presupuesto_model->getXid($id);
             $data['idPresupuesto'] = $id;
         }else{
-            //$data['actividad'] = null;
             if($var === null){
-                //$data['actividadV'] = null;
                 $data['grupoV'] = null;
             }else{
-               // $data['actividad'] = $this->actividad_model->getxID($actividad);
             }
 
             $data['product'] = NULL;
             $data['idPresupuesto'] = 0;
-            $userLogin = $this->session->userdata('user_name');
-            $data['grupo'] = $this->grupo_model->getxUsuario($userLogin);
+            $data['grupo'] = $this->grupo_model->get_grupoSinPesupuesto();
         }
 
 
@@ -290,7 +269,7 @@ class Admin_Presupuesto extends CI_Controller
         {
             $this->form_validation->set_rules('valor', 'valor', 'callback_calcularValor');
             $this->form_validation->set_rules('fecha_inicio', 'fecha inicio', 'required');
-            $this->form_validation->set_rules('fecha_fin', 'fecha fin', 'callback_fechas');
+            $this->form_validation->set_rules('fecha_final', 'fecha fin', 'callback_fechas');
            
             $this->form_validation->set_error_delimiters('<div class="alert alert-danger"><a class="close" data-dismiss="alert">&times;</a><strong>', '</strong></div>');
             
@@ -298,8 +277,8 @@ class Admin_Presupuesto extends CI_Controller
             {
                 $data_to_store = array(
                     'fechasistema' => date('Y-m-d H:m:s'),
-                    'fechaInicio' => $this->input->post('fecha_inicio'),
-                    'fechaFin' => $this->input->post('fecha_fin'),
+                    'fecha_inicio' => $this->input->post('fecha_inicio'),
+                    'fecha_final' => $this->input->post('fecha_final'),
                     'valor' => $this->input->post('valor'),
                     'autoriza' => $this->session->userdata('id_user')
                 );
@@ -329,8 +308,7 @@ class Admin_Presupuesto extends CI_Controller
             }else{
                 $data['product'] = NULL;
                 $data['url'] = $id;
-                $userLogin = $this->session->userdata('user_name');
-                $data['grupo'] = $this->grupo_model->getxUsuario($userLogin);
+                $data['grupo'] = $this->grupo_model->get_grupoSinPesupuesto();
             }
 
             $data['menu']= $this->menus->menu_usuario($this->session->userdata('user_rol_id'));
@@ -349,24 +327,44 @@ class Admin_Presupuesto extends CI_Controller
 
     public function delete()
     {
-        $id = $this->uri->segment(4);
-        $this->products_model->delete_product($id);
-        redirect('admin/products');
+        try{
+            $idPresupuesto = $this->uri->segment(4);
+            if($this->presupuesto_model->delete($idPresupuesto)){
+                $this->session->set_flashdata('flash_message', 'delete');
+                redirect('index.php/adminapp/admin_presupuesto/');
+            }else{
+                $this->session->set_flashdata('flash_message', 'Nodelete');
+                $this->session->set_flashdata('idPresupuesto',$idPresupuesto);
+                redirect('index.php/adminapp/admin_presupuesto/');
+            }
+        }catch(Exception $e){
+            show_error($e->getMessage().'---'.$e->getTraceAsString());
+        }
     }
 
+    public function deletePresupuesto(){
+        try{
+            $id = $_REQUEST["id"];
+
+            $this->presupuesto_model->deteleteXidPresupuesto($id);
+            $this->presupuesto_model->delete($id);
+        
+        }catch(Excepciones $e){
+             show_error($e->getMessage().'---'.$e->getTraceAsString());
+        }
+    }
 
     public function buscarActividad($grupo = ''){
         $data['actividad'] = $this->actividad_model->get_byId_grupo($grupo);
         return $data['actividad'];
     }
 
-    public function addActividad(){
+    public function add_actividadPresupuesto(){
         $html = null;
         
         if(isset($_POST['grupo'])){
 
             if($_POST['grupo'] === 0){
-                echo 'entro';
                 $html = "<option value=''>Seleccione </option>";
             }else{
                 $actividad = $this->buscarActividad($_POST['grupo']);
@@ -382,11 +380,11 @@ class Admin_Presupuesto extends CI_Controller
     }
 
     public function fechas($valid){
-        if($this->input->post('fecha_fin') == null){
+        if($this->input->post('fecha_final') == null){
             $this->form_validation->set_message('fechas','The fecha fin field is required.');
             return FALSE;
         }
-        else if($this->input->post('fecha_fin') < $this->input->post('fecha_inicio')){
+        else if($this->input->post('fecha_final') < $this->input->post('fecha_inicio')){
             $this->form_validation->set_message('fechas','Fecha fin debe ser mayor a la inicial.');
             return FALSE;
         }else{
@@ -403,6 +401,129 @@ class Admin_Presupuesto extends CI_Controller
             $this->form_validation->set_message('calcularValor','Opss!: El valor debe ser mayor o igual al de las actividades asociadas!. $'.$data['valor'][0]['valor']);                    
             return FALSE;
         }
+    }
+
+    public function add_actividad()
+    {
+        try{
+            $var = null;
+            $sw = false;
+
+            $tmp['1'] = 'funcion';
+            if ($this->menus->permiso_funcion($this->instancia($tmp))){
+                $idGrupo = null;
+                $id = null;
+                //$actividad = null;
+
+        if ($this->input->server('REQUEST_METHOD') === 'POST')
+        {
+            $this->form_validation->set_rules('grupo','grupo','required');
+            $this->form_validation->set_rules('valor','valor','required');
+            $this->form_validation->set_rules('fecha_inicio','fecha inicio','required');
+            $this->form_validation->set_rules('fecha_fin','fecha fin','callback_fechas');
+
+            $actividad = $this->input->post('actividad');
+            $idGrupo = $this->input->post('grupo');
+
+            /*if($actividad !== ""){
+                $this->form_validation->set_rules('actividad','actividad','required');
+                $this->form_validation->set_rules('valorActividad','valor actividad','required');
+                $sw = true;
+            }*/
+
+            $this->form_validation->set_error_delimiters('<div class="alert alert-danger"><a class="close" data-dismiss="alert">&times;</a><strong>', '</strong></div>');
+                if ($this->form_validation->run())
+                {
+                    $valor = $this->input->post('valor');
+                    if($valor === "" || $valor === NULL){
+                        $valor = 0;
+                    }
+
+                    $data_to_store = array(
+                        'fechasistema' => date('Y-m-d H:m:s'),
+                        'fecha_inicio' => $this->input->post('fecha_inicio'),
+                        'fecha_final' => $this->input->post('fecha_fin'),
+                        'valor' => $valor,
+                        'autoriza' => $this->session->userdata('id_user'),
+                        'grupo_id' => $idGrupo
+                    );
+
+                    $idPresupuesto = $this->presupuesto_model->add($data_to_store);
+                    //$idPresupuesto = 2;
+                    if($idPresupuesto > 0){
+                        /*if($sw){
+                            $data_to_store = array(
+                                'presupuesto_id' => $idPresupuesto,
+                                'actividad_id' => $this->input->post('actividad'),
+                                'valor_gasto' => $this->input->post('valorActividad')
+                            );
+
+                            if($this->presupuesto_model->addPresupuestoA($data_to_store)){
+                                //$data['idPresupuesto'] = $idPresupuesto;
+                                
+                                $this->session->set_flashdata('flash_add', 'add');
+                            }else{
+                                $this->session->set_flashdata('flash_message', 'not_addA');
+                            }
+                        }
+                        else{
+                            $this->session->set_flashdata('flash_message', 'add');
+                            $this->session->set_flashdata('flash_add', 'add');
+                        }*/
+                        $data['idPresupuesto'] = $idPresupuesto;
+                        $this->session->set_flashdata('idPresupuesto', $data['idPresupuesto']);
+                        
+                        $this->session->set_flashdata('flash_message', 'add');
+                    }else{
+                        $this->session->set_flashdata('flash_message', 'not_add'); 
+                    }
+                    redirect('index.php/adminapp/admin_presupuesto/add');
+                }else{
+                    $var = $idGrupo;
+                    $data['actividadV'] = $actividad;
+                    $data['grupoV'] = $idGrupo;
+                }
+        }
+        $id = $this->session->flashdata('idPresupuesto');
+        if($id != NULL){
+            $data['product'] = $this->presupuesto_model->getXid($id);
+            $data['idPresupuesto'] = $id;
+        }else{
+            $data['actividad'] = null;
+            if($var === null){
+                $data['actividadV'] = null;
+                $data['grupoV'] = null;
+            }else{
+                $data['actividad'] = $this->actividad_model->getxID($actividad);
+            }
+
+            $data['product'] = NULL;
+            $data['idPresupuesto'] = 0;
+            $userLogin = $this->session->userdata('user_name');
+            $data['grupo'] = $this->grupo_model->getxUsuario($userLogin);
+        }
+
+        $data['menu']= $this->menus->menu_usuario($this->session->userdata('user_rol_id'));
+        $data['op_submenu'] = $this->menus->render_submenu();
+        $data['id_menu'] = $this->id_menu;
+        $data['options_rol'] = $this->usuario_model->get_rol_option(
+                                    $this->session->userdata('user_rol_id'),
+                                    $this->session->userdata('user_rol'));
+        $data['controlador'] = $this->router->fetch_method();
+
+        $data['manufactures'] = null; 
+        $data['main_content'] = 'admin/presupuesto/add_actividad';
+        $this->load->view('includes/template', $data); 
+
+        }else{
+                $p_error['header'] = 'Acceso No autorizado';
+                $p_error['message'] = 'Permisos insuficientes para. '.$this->router->fetch_class();
+                $p_error['menu'] = $this->menus->menu_usuario($this->session->userdata('user_rol_id'));
+                $this->menus->errors($p_error);   
+            } 
+        }catch(Exception $e){
+            show_error($e->getMessage().'---'.$e->getTraceAsString());
+        } 
     }
 
 }

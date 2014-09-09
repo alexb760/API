@@ -1,3 +1,29 @@
+<script type="text/javascript">
+function showModal(){
+        var xmlhttp = null;
+
+        if(window.ActiveXObject){
+          xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+        }else{
+          if(window.XMLHttpRequest){
+            xmlhttp = new XMLHttpRequest();
+          }
+        }
+
+        xmlhttp.onreadystatechange = function(){
+          if(xmlhttp.readyState == 4 && xmlhttp.status == 200){
+            window.location.assign("http://localhost/api/index.php/adminapp/admin_presupuesto/")
+            var divSuccess = document.getElementById("divSuccess");
+            $(divSuccess).show(); 
+          }
+        }
+        
+          var url = location.href;
+          var idA = "<?php echo $idPresupuesto; ?>"; 
+          xmlhttp.open("GET",url+"/deletePresupuesto?id="+idA,true);
+          xmlhttp.send();
+        }
+</script>
 <div class="container top">
   <ul class="breadcrumb">
     <li>
@@ -45,22 +71,45 @@
             ?>
       </div>
       <?php
-        if($this->session->flashdata('flash_message'))
-        {
-          if($this->session->flashdata('flash_message') == 'delete')
-          {
-            echo '<div class="alert alert-success" id="divSuccess">';
-            echo '<a class="close" data-dismiss="alert">&times;</a>';
-            echo '<strong>Proceso Exitoso!</strong> Actividad eliminada con exito.';
-            echo '</div>';    
-          }else{
-            echo '<div class="alert alert-success" id="divSuccess">';
-            echo '<a class="close" data-dismiss="alert">&times;</a>';
-            echo '<strong>Opss!</strong> Ocurrio un error al intentar eliminar presupuesto.!';
-            echo '</div>';     
-          }
-        }
+      if($this->session->flashdata('flash_message'))
+            {
+              if($this->session->flashdata('flash_message') == 'delete')
+              {
+                echo '<div class="alert alert-success" id="divSuccess">';
+                echo '<a class="close" data-dismiss="alert">&times;</a>';
+                echo '<strong>Proceso Exitoso!</strong> Actividad eliminada con exito.';
+                echo '</div>';    
+              }else{
+                echo '<script type="text/javascript">
+                      $(document).ready(function() {
+                      $("#modalConfirm").modal("show");
+
+                      });
+                      </script>';      
+              }
+            }
       ?>
+
+      <div class="modal fade modal-two" id="modalConfirm">
+        <div class="modal-dialog modal-sm">
+          <div class="modal-content">
+          <br>
+            <div class="modal-body">
+              <div id="divInfo" class="alert alert-info">El presupuesto tiene parte asignada a una actividad. Desea continuar?</div>
+            </div>
+            <div class="modal-footer">
+              <button data-dismiss="modal" onclick="showModal()" type="submit" class="btn btn-primary">Aceptar</button>
+              <button data-dismiss="modal" class="btn">Cancelar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="alert alert-success" id="divSuccess" style="display:none">
+        <a class="close" data-dismiss="alert">&times;</a>
+        <strong>Proceso Exitoso!</strong> Actividad Eliminada con exito!.
+      </div>
+
       <div class="table_responsive">
         <?php
           $parametros['site_url'] = site_url("index.php/adminapp");
@@ -68,7 +117,7 @@
           echo print_table_vertical($products, $permiso, $parametros);
         ?>
       </tbody>
-        <tfooter>
+        <!--<tfooter>
           <tr>
             <td colspan="3">
               <span class="">
@@ -76,10 +125,11 @@
               </span>
             </td>
           </tr>
-        </tfooter>
+        </tfooter>-->
       </table>
       </div>
-      <div class="col-md-12" id="div1">
-        <?php echo '<div class="pagination">'.($this->pagination->create_links()).'</div>'; ?>
-      </div>
+      <div class="col-md-12">
+          <?php echo '<div class="pagination">'.$this->pagination->create_links().'</div>'; ?>
+          <span class=""></span>
+        </div>
     </div>

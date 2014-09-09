@@ -100,14 +100,14 @@
           </div>
 
           <div class="form-group">
-            <label for="fecha_fin" class="col-lg-2 control-label" >Fecha Fin:</label>
+            <label for="fecha_final" class="col-lg-2 control-label" >Fecha Fin:</label>
             <div class="col-lg-8">
-              <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" required
+              <input type="date" class="form-control" id="fecha_final" name="fecha_final" required
                title="se requiere fecha fin." value="<?php 
-                    if($product[0]['fecha_fin'] != NULL){
-                      echo $product[0]['fecha_fin'];
+                    if($product[0]['fecha_final'] != NULL){
+                      echo $product[0]['fecha_final'];
                     }else{
-                      echo set_value('fecha_fin');
+                      echo set_value('fecha_final');
                     }
                 ?>">
                 <span class="help-inline"><?php echo form_error('fecha_fin');?></span>

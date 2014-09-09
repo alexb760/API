@@ -89,13 +89,50 @@ class Actividad_Model extends CI_model
 		return $query->result_array(); 
 	}
 
+	public function getFilterGrupo($idG, $order, $order_type, $search_string){
+		$campo = array (
+			'actividad.id as id',
+			'actividad.descripcion as "Descripción"',
+			'actividad.fecha_inicio as "Fecha inicio"',
+			'actividad.fecha_fin as "Fecha fin"',
+			'concat_ws("",responsable.duracion," Hora(s)") as "Duración"',
+			'grupo.nombre_grupo as Grupo',
+			'concat_ws(" ",usuario.nombre,usuario.apellido) as Responsable',
+			'actividad.observacion as "Observación"');
+		$this->db->select($campo);
+		$this->db->from($this->tb_responsable);
+		$this->db->join('integrante','responsable.integrante_id = integrante.id','inner');
+		$this->db->join('usuario','integrante.usuario_id = usuario.id','inner');
+		$this->db->join('actividad','responsable.actividad_id = actividad.id','inner');
+		$this->db->join('grupo','actividad.grupo_id = grupo.id','left');
+
+		if($idG !== null && $idG !== '' && $idG !== 0){
+			$this->db->where('grupo.id', $idG);
+		}
+
+		if($search_string !== null && $search_string !== ''){
+			$this->db->like('grupo.nombre_grupo', $search_string);
+		}
+
+		if($order !== null && $order_type !== ''){
+			$this->db->order_by($order, $order_type);
+		}else{
+		    $this->db->order_by('actividad.id', 'Asc');
+		}
+
+		$query = $this->db->get();
+		$datos =  array('sql' => $this->db->last_query(),
+						'datos' => $query->result_array() );
+		return $query->result_array();
+	}
+
  	public function get_all($search_string=null, $order=null, $order_type='Asc', $limit_start, $limit_end){
 		$campo = array (
 			'actividad.id as id',
 			'actividad.descripcion as "Descripción"',
 			'actividad.fecha_inicio as "Fecha inicio"',
 			'actividad.fecha_fin as "Fecha fin"',
-			'responsable.duracion as "Duración"',
+			'concat_ws("",responsable.duracion," Hora(s)") as "Duración"',
 			'grupo.nombre_grupo as Grupo',
 			'concat_ws(" ",usuario.nombre,usuario.apellido) as Responsable',
 			'actividad.observacion as "Observación"');
@@ -116,7 +153,9 @@ class Actividad_Model extends CI_model
 		    $this->db->order_by('actividad.id', $order_type);
 		}
 
+		$this->db->order_by('grupo.id', 'asc');
 		$this->db->limit($limit_start, $limit_end);
+
 		$query = $this->db->get();
 		$datos =  array('sql' => $this->db->last_query(),
 						'datos' => $query->result_array() );

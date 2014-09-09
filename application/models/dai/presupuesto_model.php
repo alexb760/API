@@ -37,12 +37,13 @@ class Presupuesto_Model extends CI_model
 		$campos = array (
 			'presupuesto.id as id',
 			'grupo.nombre_grupo as "Nombre Grupo"',
-			'presupuesto.valor as Valor',
-			'presupuesto.fechaInicio as "Fecha Inicio"',
-			'presupuesto.fechaFin as "Fecha Fin"',
+			'concat_ws("","$",presupuesto.valor) as "Valor Inicial"',
+			'concat_ws("","$",presupuesto.valor - presupuesto_actividad.valor_gasto) as "Valor restante"',
+			'presupuesto.fecha_inicio as "Fecha Inicio"',
+			'presupuesto.fecha_final as "Fecha Fin"',
 			'concat_ws(" ",usuario.nombre,usuario.apellido) as Autoriza',
 			'actividad.descripcion as Actividad',
-			'presupuesto_actividad.valor_gasto as "Gasto Actividad"'
+			'concat_ws("","$",presupuesto_actividad.valor_gasto) as "Gasto Actividad"'
 			);
 		$this->db->select($campos);
 		$this->db->from($this->tbl_Presupuesto);
@@ -60,8 +61,8 @@ class Presupuesto_Model extends CI_model
 	public function getXid($idPresupuesto){
 		$campos = array(
 			'presupuesto.id as id',
-			'presupuesto.fechaInicio as fecha_inicio',
-			'presupuesto.fechaFin as fecha_fin',
+			'presupuesto.fecha_inicio as fecha_inicio',
+			'presupuesto.fecha_final as fecha_final',
 			'presupuesto.valor as valor',
 			'presupuesto.grupo_id as grupo_id',
 			'grupo.nombre_grupo as nombreG');
@@ -110,9 +111,32 @@ class Presupuesto_Model extends CI_model
 		}
 	}
 
-	function delete($id){
-		$this->db->where('id', $id);
-		$this->db->delete($this->tbl_Presupuesto); 
+	public function delete($id){
+		if($this->getPAxIdPresupuesto($id) <= 0){
+			$this->db->where('id', $id);
+			$this->db->delete($this->tbl_Presupuesto);
+			return TRUE; 
+		}else{
+			return FALSE; 
+		}
+	}
+
+	public function deteleteXidPresupuesto($idP){
+		try{
+			$this->db->where('presupuesto_id', $idP);
+			$this->db->delete($this->tbl_PresupuestoA);
+		}catch(Exception $e){
+			show_error($e->getMessage().'---'.$e->getTraceAsString());
+		}
+	}
+
+	public function getPAxIdPresupuesto($idP){
+		$this->db->select('presupuesto_actividad.id');
+		$this->db->from('presupuesto_actividad');
+		$this->db->where('presupuesto_actividad.presupuesto_id', $idP);
+
+		$query = $this->db->get();
+		return $query->num_rows();
 	}
 
 	public function calcularValor($idPresupuesto){

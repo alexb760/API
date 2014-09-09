@@ -34,6 +34,7 @@ class Actividad_Realizada_Model extends CI_model
 			'actividad_realizada.fecha_fin as "Fecha fin"',
 			'actividad_realizada.observacion as "Observación"',
 			'concat_ws(" ",usuario.nombre,usuario.apellido) as "Responsable"',
+			'grupo.nombre_grupo as "Grupo"',
 			//'actividad_realizada.ejecutada as ejecutada',
 			'presupuesto_actividad.valor_gasto as valor',
 			'actividad.descripcion as Actividad');
@@ -44,8 +45,8 @@ class Actividad_Realizada_Model extends CI_model
 		//$this->db->join('presupuesto','presupuesto_actividad.presupuesto_id = presupuesto.id','left');
 		$this->db->join('responsable','actividad.id = responsable.actividad_id','inner');
 		$this->db->join('integrante','responsable.integrante_id = integrante.id','inner');
+		$this->db->join('grupo','integrante.grupo_id = grupo.id','inner');
 		$this->db->join('usuario','integrante.usuario_id = usuario.id','inner');
-		//$this->db->join('grupo','presupuesto.grupo_id = grupo.id','left');
 
 
 		if($search_string !== null && $search_string !== ''){
@@ -76,6 +77,8 @@ class Actividad_Realizada_Model extends CI_model
 		
 		return $result->result_array();
 	}
+
+	
 
 	/*function get_integrante($id_grupo){
 		$campo = array(

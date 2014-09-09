@@ -3,7 +3,7 @@
       document.getElementById("grupo").disabled = true ;
       document.getElementById("valor").disabled = true;
       document.getElementById("fecha_inicio").disabled = true;
-      document.getElementById("fecha_final").disabled = true;
+      document.getElementById("fecha_fin").disabled = true;
       document.getElementById("btnGuardar").disabled = true;
     }
 </script>
@@ -33,7 +33,7 @@
       <div class="page-header">
         <h2>
           Nuevo <?php 
-          echo ("Presupuesto");
+          echo ("Presupuesto Actividad");
           ?>
         </h2>
       </div>
@@ -44,7 +44,7 @@
         {
           echo '<div class="alert alert-success">';
           echo '<a class="close" data-dismiss="alert">&times;</a>';
-          echo '<strong>Proceso Exitoso!</strong> Nuevo Presupuesto.';
+          echo '<strong>Proceso Exitoso!</strong> Nuevo presupuesto asignado a actividad.';
           echo '</div>';       
         }
         else{
@@ -60,7 +60,7 @@
       $attributes = array('class' => 'form-horizontal', 'id' => '');
       $options_manufacture = array('' => "Select");
 
-      echo form_open('index.php/adminapp/admin_presupuesto/add', $attributes);
+      echo form_open('index.php/adminapp/admin_presupuesto/add_actividad', $attributes);
       ?>
         <fieldset>
           <div class="form-group">
@@ -114,36 +114,6 @@
           </div>
 
           <div class="form-group">
-        <label for="fecha_inicio" class="col-lg-2 control-label" >Fecha Inicio:</label>
-        <div class="col-lg-8">
-          <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" required 
-            value="<?php 
-            if($product[0]['fecha_inicio'] != NULL){
-              echo $product[0]['fecha_inicio'];
-            }else{
-              echo set_value('fecha_inicio');
-            }
-            ?>" title="Se requiere fecha inicio">
-          <span class="help-inline"><?php echo form_error('fecha_inicio');?></span>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="fecha_final" class="col-lg-2 control-label" >Fecha Fin:</label>
-        <div class="col-lg-8">
-          <input type="date" class="form-control" id="fecha_final" name="fecha_final" required
-            value="<?php 
-              if($product[0]['fecha_final'] != NULL){
-                echo $product[0]['fecha_final'];
-              }else{
-                echo set_value('fecha_final');
-              }
-            ?>" title="Se requiere fecha fin">
-              <span id="sp" class="help-inline"><?php echo form_error('fecha_final');?></span>
-        </div>
-      </div>
-          
-          <!--<div class="form-group">
             <label for="actividad" class="col-lg-2 control-label">Actividad:</label>
             <div class="col-lg-8">
               <select name="actividad" id="actividad" class="form-control" title="Seleccione actividad">  
@@ -180,7 +150,7 @@
               value="<?php echo set_value('valorActividad'); ?>">
               <span class="help-inline"><?php echo form_error('valorActividad');?></span>
             </div>
-          </div>-->
+          </div>
           
           <div class="form-group">
             <div class="col-lg-offset-2 col-lg-8">
@@ -189,6 +159,32 @@
           </div>
         </div>
         </fieldset>
+        <script type="text/javascript">
+      $('#grupo').on('change', buscarActividad);
+
+      function buscarActividad(){
+        var urlR = location.href;
+
+        $grupo = $('#grupo').val();
+
+        if($grupo !== ""){
+            $.ajax({
+                dataType: "json",
+                data: {"grupo": $grupo},
+                url: urlR+'Presupuesto',
+                type: 'post',
+                beforeSend: function(){
+                },
+                success: function(respuesta){
+                  $("#actividad").html(respuesta.html);
+                },
+                error: function(xhr,err){
+                  alert("readyState: " + xhr.readyState + "\nstatus:" + xhr.status + "\n \n responseText: " + xhr.responseText);
+                }
+            });
+        }
+    }
+  </script>
   <?php
      if($idPresupuesto > 0) {
       echo '<script type="text/javascript">';

@@ -48,7 +48,11 @@ function showPrueba(){
       <div class="well">
         <?php
           $attributes = array('class' => 'form-inline reset-margin', 'id' => 'myform');
-          $options_manufacture = array(0 => "all");
+          $options_manufacture = array();
+          /*foreach ($grupo as $array) {
+              $options_manufacture("'".$array['grupo.nombre_grupo']."'" => slug($array['grupo.id']);
+          }*/
+
           $options_products = array();    
             foreach ($products as $array) {
               foreach ($array as $key => $value) {
@@ -56,18 +60,18 @@ function showPrueba(){
               }
               break;
             }
-            echo form_open('adminapp/admin_actividad', $attributes);
-            echo form_label('Search:', 'search_string');
-            echo form_input('search_string', $search_string_selected, 'style="width: 170px; height: 26px;"');
-            echo form_label('Filter by manufacturer:', 'manufacture_id');
+            echo form_open('index.php/adminapp/admin_actividad', $attributes);
+            //echo form_label('Search:', 'search_string');
+            //echo form_input('search_string', $search_string_selected, 'style="width: 170px; height: 26px;"');
+            echo form_label('Filtrar por grupo:', 'manufacture_id');
             echo form_dropdown('manufacture_id', $options_manufacture, $manufacture_selected, 'class="span2"');
             echo form_label('Order by:', 'order');
             echo form_dropdown('order', $options_products, $order, 'class="span2"');
-
-            $data_submit = array('name' => 'mysubmit', 'class' => 'btn btn-primary', 'value' => 'Go');
+            echo form_label('', '');
             $options_order_type = array('Asc' => 'Asc', 'Desc' => 'Desc');
-              
             echo form_dropdown('order_type', $options_order_type, $order_type_selected, 'class="span1"');
+            echo form_label('', '');
+            $data_submit = array('name' => 'mysubmit', 'class' => 'btn btn-primary', 'value' => 'Go');
             echo form_submit($data_submit);
             echo form_close();
         ?>

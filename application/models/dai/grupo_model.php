@@ -51,9 +51,10 @@ function get_by_id($id){
 
 		$this->db->select($campos);
 		$this->db->from($this->tbl_integrante);
-		$this->db->join('usuario','integrante.usuario_id = usuario.id','inner');
+		//$this->db->join('usuario','integrante.usuario_id = usuario.id','inner');
 		$this->db->join('grupo','integrante.grupo_id = grupo.id');
-		$this->db->where('usuario.login',$usuario);
+		$this->db->where('integrante.usuario_id',$this->session->userdata('id_user'));
+		$this->db->where('integrante.is_asesor',1);
 
 		$query = $this->db->get();
 
@@ -115,6 +116,17 @@ function get_all_(){
 			$this->db->limit($limit, $offset);
 			return $this->db->get($this->tb_name)->result();
 		}
+	}
+
+	public function get_grupoSinPesupuesto(){
+		$result = $this->db->query('SELECT grupo.id AS idGrupo, grupo.nombre_grupo as nombreG 
+					FROM grupo 
+					INNER JOIN integrante ON grupo.id = integrante.grupo_id
+					WHERE  not exists (SELECT * FROM presupuesto 
+					WHERE presupuesto.grupo_id = grupo.id)
+					AND integrante.usuario_id = '.$this->session->userdata('id_user').
+					' AND integrante.is_asesor = 1');
+		return $result->result_array();
 	}
 
  public function get_grupo($estado_id=null, $search_string=null, $order=null, $order_type='Asc', $limit_start, $limit_end)

@@ -67,7 +67,6 @@ class Admin_Actividad extends CI_Controller
             $page = $this->uri->segment(4);
 
             $limit_end = ($page * $config['per_page']) - $config['per_page'];
-            //echo $limit_end;
             if ($limit_end < 0){
                 $limit_end = 0;
             } 
@@ -75,24 +74,23 @@ class Admin_Actividad extends CI_Controller
             if($order_type){
                 $filter_session_data['order_type'] = $order_type;
             }else{
-            //we have something stored in the session? 
                 if($this->session->userdata('order_type')){
                     $order_type = $this->session->userdata('order_type');    
                 }else{
-                //if we have nothing inside session, so it's the default "Asc"
                     $order_type = 'Asc';    
                 }
             }   
-            //make the data type var avaible to our view
             $data['order_type_selected'] = $order_type; 
 
 
-            if($manufacture_id !== false && $search_string !== false && $order !== false || $this->uri->segment(2) == true){ 
+            if($manufacture_id !== false){ 
+                
                 if($manufacture_id !== 0){
                     $filter_session_data['manufacture_selected'] = $manufacture_id;
                 }else{
                     $manufacture_id = $this->session->userdata('manufacture_selected');
                 }
+
                 $data['manufacture_selected'] = $manufacture_id;
 
                 if($search_string){
@@ -100,6 +98,7 @@ class Admin_Actividad extends CI_Controller
                 }else{
                     $search_string = $this->session->userdata('search_string_selected');
                 }
+
                 $data['search_string_selected'] = $search_string;
 
                 if($order){
@@ -108,50 +107,29 @@ class Admin_Actividad extends CI_Controller
                 else{
                     $order = $this->session->userdata('order');
                 }
+
                 $data['order'] = $order;
 
-                //save session data into the session
                 $this->session->set_userdata($filter_session_data);
 
-            //fetch manufacturers data into arrays
-                $data['manufactures'] = null;//$this->manufacturers_model->get_manufacturers();
+                $data['manufactures'] = null;
 
-                $data['count_products']= $this->actividad_model->count($search_string, $order);
-                $config['total_rows'] = $data['count_products'];
-
-            //fetch sql data into arrays
-                if($search_string){
-                    if($order){
-                    $data['products'] = $this->actividad_model->get_all($search_string, $order, $order_type, $config['per_page'],$limit_end);        
-                    }else{
-                    $data['products'] = $this->actividad_model->get_all($search_string, '', $order_type, $config['per_page'],$limit_end);           
-                    }
-                }else{
-                    if($order){
-                        $data['products'] = $this->actividad_model->get_all('', $order, $order_type, $config['per_page'],$limit_end);        
-                    }else{
-                        $data['products'] = $this->actividad_model->get_all('', '', $order_type, $config['per_page'],$limit_end);        
-                    }
-                }
+                $data['products'] = $this->actividad_model->getFilterGrupo($manufacture_id, $order, $order_type, $search_string);
+                $data['count_products'] = count($data['products']);
             }else{
 
-            //clean filter data inside section
                 $filter_session_data['manufacture_selected'] = null;
                 $filter_session_data['search_string_selected'] = null;
                 $filter_session_data['order'] = null;
                 $filter_session_data['order_type'] = null;
                 $this->session->set_userdata($filter_session_data);
 
-            //pre selected options
                 $data['search_string_selected'] = '';
                 $data['manufacture_selected'] = 0;
                 $data['order'] = 'id';
 
-                //fetch sql data into arrays
                 $data['count_products']= $this->actividad_model->count_();
                 $data['products'] = $this->actividad_model->get_all('', '', $order_type, $config['per_page'],$limit_end);
-                //$data['products'] = $this->proyecto_investigacion_model->get_all_proyectos($config['per_page'],$limit_end);        
-                //$data['products'] = $this->proyecto_investigacion_model->get_all_();        
 
                 $config['total_rows'] = $data['count_products'];
 
@@ -162,6 +140,9 @@ class Admin_Actividad extends CI_Controller
                 }else{
                     $data['idActividad'] = 0;
                 }
+
+                $data['grupo'] = $this->grupo_model->get_all_();
+
             $this->pagination->initialize($config);
             $data['menu']= $this->menus->menu_usuario($this->session->userdata('user_rol_id'));
             $data['submenu'] = $this->menus->render_submenu();
@@ -204,7 +185,6 @@ class Admin_Actividad extends CI_Controller
                         'realizada'     => 1
                     );
                     $IdActividad = $this->actividad_model->add($data_to_store);
-                    //$IdActividad = 3;
                     if($IdActividad != NULL){
                         $data_responsable = array(
                             'actividad_id' => $IdActividad,
