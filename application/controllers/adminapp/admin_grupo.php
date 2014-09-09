@@ -197,6 +197,8 @@ class Admin_grupo extends CI_Controller
      public function add()
     {
         try{
+        $tmp['1'] = 'funcion';
+        if ($this->menus->permiso_funcion($this->instancia($tmp))) {
             $data['id_grupo'] = 0;
             //if save button was clicked, get the data sent via post
             if ($this->input->server('REQUEST_METHOD') === 'POST')
@@ -261,6 +263,12 @@ class Admin_grupo extends CI_Controller
             //load the view 
             $data['main_content'] = 'admin/grupo/add';
             $this->load->view('includes/template', $data);
+            }else{
+            $p_error['header'] = 'Acceso No autorizado';
+            $p_error['message'] = 'Permisos insuficientes para. '.$this->router->fetch_class();
+            $p_error['menu'] = $this->menus->menu_usuario($this->session->userdata('user_rol_id'));
+            $this->menus->errors($p_error);   
+        }
 
         }catch(Exception $e){
             show_error($e->getMessage().' --- '.$e->getTraceAsString());
